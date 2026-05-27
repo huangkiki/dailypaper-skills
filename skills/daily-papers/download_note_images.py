@@ -8,6 +8,7 @@ For each external image link ![...](https://...):
   - Reachable (HTTP 200 within 10s) → keep as-is
   - Unreachable → download to assets/ and replace with Obsidian wikilink
 """
+from __future__ import annotations
 
 import asyncio
 import json

@@ -87,10 +87,10 @@ python3 ../daily-papers/fetch_and_score.py --days N > /tmp/daily_papers_top30.js
 **先把 Phase 2 的 Top 30 结果保存到临时文件**，然后运行：
 
 ```bash
-cat /tmp/daily_papers_top30.json | python3 ../daily-papers/enrich_papers.py /tmp/daily_papers_enriched.json
+python3 ../daily-papers/enrich_papers.py /tmp/daily_papers_top30.json /tmp/daily_papers_enriched.json
 ```
 
-注意：使用**文件路径参数**（而非 stdout 重定向），避免 sandbox 环境下 stdout/stderr 混淆。
+注意：使用**两个文件路径参数（输入 + 输出）**，避免 sandbox 环境下 stdout/stderr 混淆。脚本会把第一个 `.json` 参数当作输入路径、第二个当作输出路径；如果只传一个 `.json` 它会被当作输入路径，结果走 stdout。
 
 脚本自动完成以下工作（Semaphore(10) 限制并发，单篇超时 30 秒）：
 - 并行抓取 HTML 页面 + PDF 页面

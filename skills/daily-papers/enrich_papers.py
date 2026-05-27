@@ -20,6 +20,7 @@ Architecture:
     - Pure regex HTML parsing (no WebFetch / no external deps)
     - Per-request timeout via curl --max-time (no Python-level per-paper timeout)
 """
+from __future__ import annotations
 
 import asyncio
 import json
