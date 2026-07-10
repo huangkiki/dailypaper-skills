@@ -30,6 +30,7 @@ DEFAULT_CONFIG = {
         "obsidian_vault": "~/ObsidianVault",
         "paper_notes_folder": "论文笔记",
         "daily_papers_folder": "DailyPapers",
+        "github_trending_folder": "GitHubTrending",
         "concepts_folder": "_概念",
         "zotero_db": "~/Zotero/zotero.sqlite",
         "zotero_storage": "~/Zotero/storage",

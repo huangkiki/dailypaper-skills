@@ -31,6 +31,7 @@
 - 对重点论文生成结构化笔记，包括方法、实验、公式、图表、局限和后续可追的问题。
 - 自动写进 Obsidian，并维护论文目录页和概念索引。
 - 如果你用 Zotero，也可以直接按标题搜索，或者按分类批量读论文。
+- 顺手还能抓 GitHub 周榜，看看最近哪些开源项目 star 涨得最快，并按你的方向标注相关性。
 
 最后在 Obsidian 里大概会长这样：
 
@@ -58,6 +59,16 @@ ObsidianVault/
 过去3天论文推荐
 过去一周论文推荐
 ```
+
+想看看最近 GitHub 上 star 涨得最快的项目：
+
+```text
+GitHub 周榜
+过去一周 GitHub 热门
+GitHub 日榜
+```
+
+生成的榜单会写到 Obsidian 的 `GitHubTrending/` 目录，并按你的研究方向自动标注哪些和你相关。
 
 读单篇论文：
 
@@ -106,6 +117,7 @@ cp -r ./skills/* ~/.claude/skills/
 VAULT=~/ObsidianVault
 
 mkdir -p "$VAULT/DailyPapers" \
+  "$VAULT/GitHubTrending" \
   "$VAULT/论文笔记/_概念/0-待分类" \
   "$VAULT/论文笔记/_待整理"
 ```
@@ -144,6 +156,24 @@ claude --dangerously-skip-permissions
 | `daily_papers.domain_boost_keywords` | 额外加分的领域词 |
 
 Zotero 分类批量阅读不需要你另外写映射文件。只要 `paths.zotero_db` 和 `paths.zotero_storage` 配好，脚本会直接从 Zotero 分类树里查。
+
+## 🖥️ 网页可视化（可选）
+
+如果你想在浏览器里翻每日推荐、论文笔记、概念库和 GitHub 周榜，仓库自带一个轻量 Web Viewer（FastAPI + 原生前端，无需打包）。
+
+```bash
+cd web-viewer
+pip install -r requirements.txt
+python3 app.py
+```
+
+然后打开 `http://localhost:8080`。它会自动读取你 `~/.claude/skills/_shared/user-config.json` 里的 `obsidian_vault`，把这些内容渲染出来：
+
+- 📰 **Daily Papers**：每日/每周推荐，带“必读 / 值得看 / 可跳过”分流卡片。
+- 🔥 **GitHub Trending**：`GitHubTrending/` 里的周榜笔记。
+- 📝 **Paper Notes** / 🧠 **Concepts**：论文笔记和概念库，支持 `[[双向链接]]` 跳转、LaTeX 公式、全文搜索。
+
+页面里还内置了一个 Claude 对话框，可以直接在浏览器里喊“今日论文推荐”“GitHub 周榜”触发流程（它在后台调用本机的 `claude` CLI）。
 
 ## 我一般怎么搭配 Zotero AI Sidebar
 
@@ -211,11 +241,13 @@ skills/
 ├── daily-papers/          # 每日推荐总入口
 ├── paper-reader/          # 单篇论文阅读与笔记生成
 ├── generate-mocs/         # Obsidian 目录页生成
+├── github-trending/       # GitHub 周榜（star 涨最快的项目）
 ├── daily-papers-fetch/    # 内部：抓取候选论文
 ├── daily-papers-review/   # 内部：生成推荐点评
 ├── daily-papers-notes/    # 内部：生成重点论文笔记
 └── _shared/               # 共享配置和索引脚本
 
+web-viewer/                # 可选：本地网页可视化（FastAPI）
 obsidian-templates/
 └── 论文笔记模板.md
 ```
@@ -224,6 +256,7 @@ obsidian-templates/
 
 - `daily-papers`
 - `paper-reader`
+- `github-trending`
 - `generate-mocs`
 
 另外几个是流水线内部拆出来的步骤，主要方便调试和重跑。

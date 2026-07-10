@@ -14,6 +14,8 @@
     │
     ├─ "读一下这篇论文" ──→ paper-reader（独立 fork）
     │
+    ├─ "GitHub 周榜" ──→ github-trending（Python，零 token）
+    │
     └─ "更新索引" ──→ generate-mocs（Python 脚本）
 ```
 
@@ -214,6 +216,56 @@ python3 paper_daemon.py --list       # 列出所有分类
 
 ---
 
+## github-trending
+
+**纯 Python，不消耗 Claude token。** 抓 GitHub Trending 榜（star 涨得最快的项目），打分标注，写成 Obsidian 笔记。
+
+### fetch_trending.py
+
+- 数据源：`https://github.com/trending?since={daily|weekly|monthly}`，可选 `&l={language}` 按语言过滤。
+- SSL 兜底：默认走验证连接；遇到证书验证失败（含被包成 `URLError` 的情况，常见于有中间人代理的环境），自动退回不验证证书的 SSL context 重试。
+- 解析：regex 从每个 `Box-row` 提取 repo、简介、语言、累计 star/fork、本周期新增 star。
+- 打分：复用 `_shared/user-config.json` 的 `keywords`（+2）/`domain_boost_keywords`（+1）/`negative_keywords`（-3），
+  标注 `relevant`（命中正向或领域词且未被负向词压过）。**不丢弃非相关项**，只标注。
+- 按本周期新增 star 降序，输出 JSON（stdout）。
+
+### write_trending_note.py
+
+- 读 JSON，写到 `{VAULT}/{github_trending_folder}/`（默认 `GitHubTrending/`）。
+- 周榜文件名按 ISO 周编号（如 `2026-W28 GitHub周榜.md`），日/月榜用日期。
+- 笔记结构：摘要 → 「🎯 与研究方向相关」列表 → 「📊 完整榜单」表格（含 ✅ 相关标记）。
+
+---
+
+## web-viewer（可选）
+
+**本地网页可视化，FastAPI 后端 + 原生前端（无构建）。** 只读渲染 Obsidian 内容，不改文件。
+
+### 配置解析（app.py `load_config()`）
+
+按优先级找 `user-config.json`：①`~/.claude/skills/_shared/user-config.json`（安装后用户实际编辑的部署副本，优先）
+②`web-viewer/../skills/_shared/user-config.json`（仓库自带模板）。用第一个 `obsidian_vault` 真实存在的配置；都不行则兜底到仓库根目录。
+所有目录名（DailyPapers / GitHubTrending / 论文笔记 / _概念）都从 config 读取，带默认值。
+
+### 后端端点
+
+| 端点 | 说明 |
+|------|------|
+| `GET /api/daily-papers` `/{filename}` | 每日推荐列表 / 详情（含 tier 分流表解析） |
+| `GET /api/github-trending` `/{filename}` | GitHub 周榜列表 / 详情 |
+| `GET /api/paper-notes` `/{filename}` | 论文笔记列表 / 详情 |
+| `GET /api/concepts` `/{category}/{filename}` | 概念库分类 / 详情 |
+| `GET /api/search?q=` | 全文搜索（文件名 + 正文） |
+| `GET /api/wikilink-index` | `[[双向链接]]` 解析索引（启动时构建） |
+| `POST /api/claude` | 调本机 `claude` CLI，SSE 流式返回（浏览器里触发流程） |
+
+### 前端（static/app.js）
+
+hash 路由：`route(pattern, handler)` + `resolve()`。列表/详情页复用同一套 `api()` + `renderMd()`（marked + KaTeX + 自定义 wikilink/callout 扩展）。
+加新页面只需三步：注册 `route()`、写 `pageXxx` 渲染函数、在 `updateActiveNav()` 加高亮分支（Trending 页即照此实现）。
+
+---
+
 ## _shared 公共模块
 
 ### user-config.json
@@ -226,6 +278,7 @@ python3 paper_daemon.py --list       # 列出所有分类
     "obsidian_vault": "~/ObsidianVault",
     "paper_notes_folder": "论文笔记",
     "daily_papers_folder": "DailyPapers",
+    "github_trending_folder": "GitHubTrending",
     "concepts_folder": "_概念",
     "zotero_db": "~/Zotero/zotero.sqlite",
     "zotero_storage": "~/Zotero/storage"
@@ -263,6 +316,8 @@ MOC 生成引擎，被 `generate_concept_mocs.py` 和 `generate_paper_mocs.py` �
 ├── DailyPapers/
 │   ├── YYYY-MM-DD-论文推荐.md      # 每日推荐
 │   └── .history.json                # 跨天去重索引
+├── GitHubTrending/
+│   └── YYYY-Www GitHub周榜.md       # GitHub 周榜（github-trending 生成）
 ├── 论文笔记/
 │   ├── 3-Robotics/
 │   │   ├── 1-VLX/VLA/
