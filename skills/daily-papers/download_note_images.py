@@ -27,6 +27,18 @@ from user_config import temp_file_path
 CURL_TIMEOUT = 10
 CONCURRENCY = 5
 
+_DUPE_PATH_RE = re.compile(
+    r"(https://arxiv\.org/html/)(\d{4}\.\d{4,5}v\d+)/\2/"
+)
+
+
+def fix_duplicate_arxiv_paths(text: str) -> str:
+    """Fix doubled arxiv_id path segments in image URLs.
+
+    e.g. .../2607.04988v1/2607.04988v1/x1.png -> .../2607.04988v1/x1.png
+    """
+    return _DUPE_PATH_RE.sub(r"\g<1>\2/", text)
+
 
 def parse_note(text: str) -> list[dict]:
     """Extract all external image references with their positions.
@@ -178,6 +190,14 @@ def update_frontmatter(text: str) -> str:
 async def process_note(note_path: Path) -> dict:
     """Main processing logic. Returns summary dict."""
     text = note_path.read_text(encoding="utf-8")
+
+    fixed_text = fix_duplicate_arxiv_paths(text)
+    if fixed_text != text:
+        n_fixes = text.count("/html/") - fixed_text.count("/html/")
+        note_path.write_text(fixed_text, encoding="utf-8")
+        text = fixed_text
+        print(f"Auto-fixed {n_fixes} duplicate arxiv path(s) in {note_path.name}")
+
     images = parse_note(text)
 
     if not images:

@@ -50,22 +50,31 @@ python3 ../daily-papers/download_note_images.py "{笔记路径}"
 - 下载也失败时，尝试从 PDF 提取对应 figure
 - 有本地化操作时，自动更新 frontmatter `image_source: online` → `mixed`
 
-## 图片 URL 规范化（防止路径重复）
+## ⚠️ 图片 URL 规范化（防止路径重复）— 高频 Bug
 
-WebFetch 返回的图片路径可能是**相对路径**（如 `2603.05312v1/x1.png`），也可能是**已解析的绝对路径**。
-拼接 URL 时极易出现路径重复 bug（如 `.../2603.05312v1/2603.05312v1/x1.png`）。
+> **这是已反复出现的 bug，务必严格执行。**
 
-**铁律**: 写入笔记前，必须对每个图片 URL 执行以下检查：
-
-1. 如果 URL 已经是 `https://arxiv.org/html/...` 的完整形式，直接使用，不要再拼接
-2. 如果是相对路径，**只用** `https://arxiv.org/html/` 作为 base，不要再加 `{arxiv_id}/`
-   - 因为相对路径通常已经包含 `{arxiv_id}/`（如 `2603.05312v1/x1.png`）
-3. **最终验证**: 检查 URL 中是否存在连续两段相同的 arxiv_id（如 `2603.05312v1/2603.05312v1/`），如果有，删除重复段
-
-示例：
+arXiv HTML 中图片的 `src` 属性是相对路径，且**已包含版本目录前缀**：
+```html
+<img src="2607.04988v1/x1.png">        <!-- 常见格式 -->
+<img src="2607.04988v1/figures/fig1.png"> <!-- 子目录格式 -->
 ```
-✗ https://arxiv.org/html/2603.05312v1/2603.05312v1/x1.png  ← 重复了
-✓ https://arxiv.org/html/2603.05312v1/x1.png               ← 正确
+
+### 绝对 URL 构建规则
+
+| src 值 | 正确拼接 | 错误拼接 |
+|--------|----------|----------|
+| `2607.04988v1/x1.png` | `https://arxiv.org/html/` + src | `https://arxiv.org/html/2607.04988v1/` + src |
+| `figures/fig1.png` | `https://arxiv.org/html/2607.04988v1/` + src | — |
+
+**铁律**:
+1. 如果 src 以 `2` 开头（含 arxiv_id 前缀），base = `https://arxiv.org/html/`
+2. 如果 src 不含 arxiv_id 前缀（如 `figures/`），base = `https://arxiv.org/html/{arxiv_id}v1/`
+3. **写入前必须验证**：URL 中不得出现连续两段相同的 arxiv_id（如 `2607.04988v1/2607.04988v1/`）
+
+```
+✗ https://arxiv.org/html/2607.04988v1/2607.04988v1/x1.png  ← 路径重复，404
+✓ https://arxiv.org/html/2607.04988v1/x1.png               ← 正确
 ```
 
 ## 笔记中的图片引用格式

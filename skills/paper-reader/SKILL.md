@@ -100,7 +100,10 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
    - `pdfimages -png` 从 PDF 中提取，筛选 >10KB 的有效图片
 5. 笔记中用 `![Figure X](url)` 外链嵌入
 6. 验证：外链可加载 / 本地文件 >10KB
-7. **URL 去重**：写入前检查 URL 中是否有重复的 arxiv_id 路径段（如 `2603.05312v1/2603.05312v1/`），有则删除重复段。详见 `references/image-troubleshooting.md`
+7. **URL 去重（必做）**：写入前检查每个 URL，如果 `https://arxiv.org/html/` 后出现了连续两段相同的 arxiv_id（如 `2607.04988v1/2607.04988v1/`），删除重复段。这是高频 bug，详见 `references/image-troubleshooting.md`
+   - 原因：arXiv HTML 中 img src 已含 `{id}v1/` 前缀，拼接时不要再加一次
+   - 正确：`https://arxiv.org/html/` + src（如 `https://arxiv.org/html/2607.04988v1/x1.png`）
+   - 错误：`https://arxiv.org/html/2607.04988v1/` + src（导致路径重复，返回 404）
 
 > ar5iv 编号不一定对应 Figure 编号，排错见 `references/image-troubleshooting.md`
 

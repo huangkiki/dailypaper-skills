@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ObsidianNotes Viewer</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.0/marked.min.js"></script>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="logo" onclick="location.hash='/'">
+      <span class="logo-icon">📚</span>
+      <span class="logo-text">PaperVault</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#/" class="nav-item" data-route="daily">
+        <span class="nav-icon">📰</span><span>Daily Papers</span>
+      </a></li>
+      <li><a href="#/trending" class="nav-item" data-route="trending">
+        <span class="nav-icon">🔥</span><span>GitHub Trending</span>
+      </a></li>
+      <li><a href="#/notes" class="nav-item" data-route="notes">
+        <span class="nav-icon">📝</span><span>Paper Notes</span>
+      </a></li>
+      <li><a href="#/concepts" class="nav-item" data-route="concepts">
+        <span class="nav-icon">🧠</span><span>Concepts</span>
+      </a></li>
+    </ul>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search..."
+             onkeydown="if(event.key==='Enter')doSearch()">
+    </div>
+  </nav>
+
+  <main id="content">
+    <div class="loading">Loading...</div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
