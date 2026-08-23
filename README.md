@@ -293,7 +293,7 @@ obsidian-templates/
 
 如果这套 workflow 对你有帮助，欢迎点 Star、提 PR，或者分享你的适配版本。像 [`codex+humanoid`](https://github.com/huangkiki/dailypaper-skills/tree/codex%2Bhumanoid) 这种兼容性适配也很欢迎。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=huangkiki/dailypaper-skills&type=Date)](https://www.star-history.com/#huangkiki/dailypaper-skills&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=huangkiki/dailypaper-skills&type=Date)](https://star-history.dera.page/#huangkiki/dailypaper-skills&Date)
 
 ## License
 
