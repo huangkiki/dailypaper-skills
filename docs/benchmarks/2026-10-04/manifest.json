@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-04",
+  "status": "jev_measured_baseline_unavailable",
+  "candidate_snapshot": "HF Daily + Trending and recent arXiv, collected in one daily run; not limited to papers published today",
+  "source_counts": {
+    "hf_after_scoring": 49,
+    "arxiv_after_scoring": 397,
+    "merged": 443,
+    "candidates": 30
+  },
+  "jev": {
+    "model": "jev-1.13.0",
+    "requests": 3,
+    "input_tokens": 18498,
+    "output_tokens": 462,
+    "elapsed_seconds": 1.4737,
+    "selected": 10
+  },
+  "additional_probe_usage": {
+    "input_tokens": 1041,
+    "output_tokens": 19
+  },
+  "baseline_probes": [
+    {
+      "interface": "configured Messages API",
+      "status": "HTTP 401",
+      "usage": null
+    },
+    {
+      "interface": "configured local Chat Completions relay",
+      "status": "HTTP 502",
+      "usage": null
+    }
+  ],
+  "files": {
+    "candidates.json": "a9dae898c03f4e5baf21acfc3f9ba9c41b96b67c7875bf6ff450d5fe64ee413c",
+    "projects.json": "2d2e2f5bdf89647bf08b299be5d591c56f8397993a65fb4c89ed4e5e67950ea9",
+    "benchmark-incomplete.json": "26fed53ce3e1384c9442566ecca54f3fd0b3d3f5e611aae6b5979f8f726d2c65",
+    "jev-ranking.json": "1f037696c54b74dd7f8bba016184bf236c207763c1093359236e7fea08af69c5"
+  }
+}

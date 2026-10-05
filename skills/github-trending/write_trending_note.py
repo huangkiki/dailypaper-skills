@@ -10,6 +10,7 @@
 - 纯标准库；进度日志走 stderr，最终笔记路径走 stdout。
 """
 
+import argparse
 import json
 import sys
 from datetime import date, datetime
@@ -43,7 +44,7 @@ def md_escape(text: str) -> str:
     return text.replace("|", "\\|").replace("\n", " ").strip()
 
 
-def build_markdown(repos: list[dict], period: str, today: date) -> str:
+def build_markdown(repos: list[dict], period: str, today: date, projects: dict | None = None) -> str:
     unit = PERIOD_UNIT.get(period, "")
     label = PERIOD_LABEL.get(period, "榜单")
     relevant = [r for r in repos if r.get("relevant")]
@@ -79,6 +80,22 @@ def build_markdown(repos: list[dict], period: str, today: date) -> str:
                 lines.append(f"  - 命中关键词: {kws}")
         lines.append("")
 
+    if projects is not None:
+        lines.extend(["## 仿真新项目与生态更新", "",
+                      f"检索范围：{projects['start_date']} 至 {projects['end_date']}；按主题发现，不限已知项目名。",
+                      "每个检索式最多取 10 项，不保证穷尽；代码推送不等于新版本发布。", ""])
+        if projects.get("status") != "complete":
+            lines.extend(["> 部分检索失败或结果不完整；空列表不能证明没有新项目。", ""])
+        for key, heading in (("new_projects", "期间新建"), ("recently_updated", "已有项目近期更新")):
+            lines.extend([f"### {heading}", ""])
+            items = projects.get(key, [])
+            for repo in items:
+                lines.append(f"- [{repo['repo']}]({repo['url']}) — {md_escape(repo['description'])} "
+                             f"（⭐ {repo['stars']:,}；创建 {repo['created_at'][:10]}；推送 {repo['pushed_at'][:10]}）")
+            if not items:
+                lines.append("本次检索未返回项目。")
+            lines.append("")
+
     lines.append(f"## 📊 完整{label}")
     lines.append("")
     lines.append(f"| # | 项目 | {unit}新增⭐ | 累计⭐ | 语言 | 相关 | 简介 |")
@@ -102,22 +119,25 @@ def build_markdown(repos: list[dict], period: str, today: date) -> str:
 
 
 def main() -> int:
-    if len(sys.argv) < 2:
-        log("用法: python3 write_trending_note.py <input.json>")
-        return 1
-    data = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-    if not data:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input", type=Path)
+    parser.add_argument("--projects", type=Path, help="Optional discover_projects.py result")
+    parser.add_argument("--period", choices=tuple(PERIOD_LABEL), default="weekly")
+    args = parser.parse_args()
+    data = json.loads(args.input.read_text(encoding="utf-8"))
+    projects = json.loads(args.projects.read_text(encoding="utf-8")) if args.projects else None
+    if not data and projects is None:
         log("⚠️  输入为空，未生成笔记")
         return 1
 
-    period = data[0].get("period", "weekly")
+    period = data[0].get("period", args.period) if data else args.period
     today = date.today()
 
     out_dir = target_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / note_filename(period, today)
 
-    out_path.write_text(build_markdown(data, period, today), encoding="utf-8")
+    out_path.write_text(build_markdown(data, period, today, projects), encoding="utf-8")
     log(f"✅ 已写入: {out_path}")
     print(str(out_path))
     return 0

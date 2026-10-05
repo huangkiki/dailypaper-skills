@@ -7,6 +7,10 @@ description: |
   内部会自动串联论文抓取、推荐生成、重点论文笔记三步，无需用户手动拆开。
 ---
 
+## 执行环境
+
+开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。
+
 # 每日论文推荐
 
 这是面向用户的一句话入口。对用户来说，正常只需要说一次：
@@ -21,9 +25,9 @@ description: |
    - `今日论文推荐`、`每日推荐`、`今日论文` -> 当天
    - `过去3天论文推荐`、`最近3天论文` -> 3 天
    - `过去一周论文推荐`、`看看这周有啥论文` -> 7 天
-2. 自动调用 `/daily-papers-fetch`。
-3. 第 1 步完成后，自动调用 `/daily-papers-review`。
-4. 第 2 步完成后，自动调用 `/daily-papers-notes`。
+2. 执行 [daily-papers-fetch](../daily-papers-fetch/SKILL.md)，传入时间范围。
+3. 第 1 步完成后，执行 [daily-papers-review](../daily-papers-review/SKILL.md)。
+4. 第 2 步完成后，执行 [daily-papers-notes](../daily-papers-notes/SKILL.md)。
 5. 全部完成后，用一句话告诉用户：
    - 推荐文件已生成
    - 重点论文笔记已生成多少篇
@@ -31,6 +35,7 @@ description: |
 
 ## 重要约束
 
+- 只有当前阶段的预期文件已生成且检查通过，才进入下一阶段。发生失败时记录阶段和原因，保留已完成产物。
 - 不要先要求用户手动跑 `跑一下论文抓取 / 点评 / 笔记`。
 - 这 3 句是内部流水线和调试入口，不是首页主交互。
 - 如果用户明确只想跑其中一步，再交给对应 skill。

@@ -8,31 +8,37 @@
 用户说一句话
     │
     ├─ "今日论文推荐" ──→ daily-papers（编排器）
-    │                        ├─ Step 1: daily-papers-fetch（Python，零 token）
-    │                        ├─ Step 2: daily-papers-review（Claude 点评）
-    │                        └─ Step 3: daily-papers-notes（Claude + paper-reader）
+    │                        ├─ Step 1: daily-papers-fetch（Python 召回 + Jev 评分）
+    │                        ├─ Step 2: daily-papers-review（Agent 点评）
+    │                        └─ Step 3: daily-papers-notes（Agent + paper-reader）
     │
-    ├─ "读一下这篇论文" ──→ paper-reader（独立 fork）
+    ├─ "读一下这篇论文" ──→ paper-reader（可选独立上下文）
     │
-    ├─ "GitHub 周榜" ──→ github-trending（Python，零 token）
+    ├─ "GitHub 周榜" ──→ github-trending（Python，无模型调用）
     │
     └─ "更新索引" ──→ generate-mocs（Python 脚本）
 ```
 
-三步流水线的设计主要是为了控制单次上下文长度。每步之间通过 `/tmp` 下的 JSON 文件传数据。
+三步流水线便于控制上下文并按阶段重跑。每步之间通过共享临时目录的 JSON 文件传数据；目录由 `user_config.temp_dir()` 解析，可用 `DAILYPAPER_TEMP_DIR` 覆盖。默认 Linux/macOS 为 `/tmp`，Windows 为 `~/tmp`。多任务并行时每条流水线使用不同目录。
+
+## 跨 Agent 运行
+
+`install.py` 将七个技能和 `_shared` 完整复制到宿主技能目录，支持多目标、预览和显式更新；更新保留已有个人配置，写入前检查全部目标的冲突。具体目录与接入边界见 [Agent 接入文档](docs/agents.md)。
+
+所有 Skill 首先读取 [agent-runtime.md](skills/_shared/agent-runtime.md)，从 `user_config.py` 获取有效配置与临时目录。脚本相对路径按当前 `SKILL.md` 所在目录解析；跨技能调用可用原生 Skill 入口或直接读取相邻 `SKILL.md`。子 Agent 是可选能力。
 
 ---
 
 ## Step 1: daily-papers-fetch
 
-**纯 Python，不消耗 Claude token。**
+**Python 负责抓取与召回；默认由 Jev Score 完成语义评分，记录真实 API usage。**
 
 ### 1.1 抓取 + 打分（fetch_and_score.py）
 
 数据源：
 - HuggingFace Daily Papers API：`https://huggingface.co/api/daily_papers?date=YYYY-MM-DD`
 - HuggingFace Trending API：`https://huggingface.co/api/daily_papers?sort=trending`
-- arXiv API：`https://export.arxiv.org/api/query`，搜索 `cs.RO, cs.CV, cs.AI, cs.LG`
+- arXiv API：`https://export.arxiv.org/api/query`，搜索 配置指定的分类，默认含 `cs.RO, cs.LG, cs.AI, cs.CL, cs.DC, cs.CV`
 
 打分规则：
 - 命中 `negative_keywords` → 直接 -999 排除
@@ -47,7 +53,9 @@
 - 多天模式（days > 1）：跳过历史去重
 - 候选不足 20 篇时从历史回补
 
-输出：`/tmp/daily_papers_top30.json`
+语义评分：关键词候选池默认每日最多 30 篇，Jev 按 `research_interests` 逐篇评分，过滤低于阈值的论文后取最多 10 篇。共享兴趣作为 state，每道问题只附当前论文，避免为每个判断重复带入其他候选摘要。失败停止，不静默换后端。原始请求、答案、概率、耗时与 usage 保存在 `daily_papers_ranking.json`。
+
+输出：`{TEMP_DIR}/daily_papers_selected.json`。`--output` 直接写 UTF-8 JSON；省略时仍写 stdout。
 
 ### 1.2 元数据富化（enrich_papers.py）
 
@@ -58,13 +66,13 @@
 - HTML 取不到时 fallback 到 `pdftotext` 提取机构
 - 再 fallback 到 arXiv abs 页面的 `<meta>` 标签
 
-输出：`/tmp/daily_papers_enriched.json`
+输出：`{TEMP_DIR}/daily_papers_enriched.json`
 
 ---
 
 ## Step 2: daily-papers-review
 
-**Claude 主导，读候选列表写点评。**
+**Agent 主导，读候选列表写点评。**
 
 ### 2.1 扫描已有笔记
 
@@ -72,7 +80,7 @@ Glob 扫描 Obsidian 的论文笔记和概念库目录，把候选论文跟已�
 
 ### 2.2 写锐评
 
-Claude 以"毒舌但有料的资深研究员"角色点评每篇论文：
+Agent 以"毒舌但有料的资深研究员"角色点评每篇论文：
 - 分流表：🔥 必读 / 👀 值得看 / 💤 可跳过
 - 每篇包含：作者、机构、链接、来源、核心方法（带 `[[概念]]` 链接）、对比方法、借鉴意义、锐评
 - 已有笔记的论文走简化格式
@@ -93,7 +101,7 @@ Claude 以"毒舌但有料的资深研究员"角色点评每篇论文：
 
 ## Step 3: daily-papers-notes
 
-**Claude 编排 + 多次调用 paper-reader。**
+**Agent 编排 + 多次调用 paper-reader。**
 
 ### 3.1 概念库补充
 
@@ -128,7 +136,7 @@ Claude 以"毒舌但有料的资深研究员"角色点评每篇论文：
 
 ## paper-reader
 
-**独立 fork 运行，完整工具链（Bash / Read / Write / Edit / WebFetch / WebSearch）。**
+**通过当前宿主的文件、命令执行和网页工具运行；支持且允许子 Agent 时可用独立上下文，否则在当前会话逐篇执行。**
 
 ### 输入源
 
@@ -183,7 +191,7 @@ Claude 以"毒舌但有料的资深研究员"角色点评每篇论文：
 2. 检查概念笔记是否存在
 3. 不存在的按 16 类自动分类并创建
 
-### 批量处理（paper_daemon.py）
+### 批量处理（paper_daemon.py，可选 Claude CLI 扩展）
 
 ```bash
 python3 paper_daemon.py -c "VLA"     # 处理 VLA 分类
@@ -218,7 +226,7 @@ python3 paper_daemon.py --list       # 列出所有分类
 
 ## github-trending
 
-**纯 Python，不消耗 Claude token。** 抓 GitHub Trending 榜（star 涨得最快的项目），打分标注，写成 Obsidian 笔记。
+**纯 Python，脚本本身不调用模型，Agent 编排仍会消耗 token。** 抓 GitHub Trending 榜（star 涨得最快的项目），打分标注，写成 Obsidian 笔记。
 
 ### fetch_trending.py
 
@@ -227,25 +235,31 @@ python3 paper_daemon.py --list       # 列出所有分类
 - 解析：regex 从每个 `Box-row` 提取 repo、简介、语言、累计 star/fork、本周期新增 star。
 - 打分：复用 `_shared/user-config.json` 的 `keywords`（+2）/`domain_boost_keywords`（+1）/`negative_keywords`（-3），
   标注 `relevant`（命中正向或领域词且未被负向词压过）。**不丢弃非相关项**，只标注。
-- 按本周期新增 star 降序，输出 JSON（stdout）。
+- 按本周期新增 star 降序，输出 JSON（stdout 或 `--output` 指定的 UTF-8 文件）。
+
+### discover_projects.py
+
+- 使用 GitHub Repository Search，按 `daily_papers.project_queries` 主题分别检索时间范围内新建与近期推送的项目，不把项目名当白名单。
+- 每个查询取最多 10 项、按仓库去重，保留创建 / 推送日期、查询来源和 API 失败；推送不等于正式版本发布。
+- 可使用环境变量 `GITHUB_TOKEN` / `GH_TOKEN`，报告不包含凭据。
 
 ### write_trending_note.py
 
 - 读 JSON，写到 `{VAULT}/{github_trending_folder}/`（默认 `GitHubTrending/`）。
 - 周榜文件名按 ISO 周编号（如 `2026-W28 GitHub周榜.md`），日/月榜用日期。
-- 笔记结构：摘要 → 「🎯 与研究方向相关」列表 → 「📊 完整榜单」表格（含 ✅ 相关标记）。
+- 笔记结构：摘要 → 「🎯 与研究方向相关」列表 → 可选的新建 / 更新项目候选 → 「📊 完整榜单」表格。用 `--projects` 接收发现结果；部分检索失败会明确提示。
 
 ---
 
 ## web-viewer（可选）
 
-**本地网页可视化，FastAPI 后端 + 原生前端（无构建）。** 只读渲染 Obsidian 内容，不改文件。
+**本地网页可视化，FastAPI 后端 + 原生前端（无构建）。** 浏览接口只读渲染 Obsidian 内容；可选 Claude 对话接口会调用 CLI 执行用户请求，可能产生笔记文件。
 
 ### 配置解析（app.py `load_config()`）
 
-按优先级找 `user-config.json`：①`~/.claude/skills/_shared/user-config.json`（安装后用户实际编辑的部署副本，优先）
-②`web-viewer/../skills/_shared/user-config.json`（仓库自带模板）。用第一个 `obsidian_vault` 真实存在的配置；都不行则兜底到仓库根目录。
-所有目录名（DailyPapers / GitHubTrending / 论文笔记 / _概念）都从 config 读取，带默认值。
+复用 `skills/_shared/user_config.py`，支持共享个人配置、`DAILYPAPER_CONFIG` 和 `OBSIDIAN_VAULT_PATH`。保留旧版 Claude 安装目录作为低优先级配置来源，并读取其 local 覆盖。显式配置不存在或共享配置损坏时报错，不静默换库。
+
+目录名由有效配置读取，带默认值。笔记库不存在时，保留原有仓库根目录展示行为。
 
 ### 后端端点
 
@@ -284,12 +298,15 @@ hash 路由：`route(pattern, handler)` + `resolve()`。列表/详情页复用�
     "zotero_storage": "~/Zotero/storage"
   },
   "daily_papers": {
-    "keywords": ["world model", "diffusion model", "embodied ai", ...],
+    "keywords": ["reinforcement learning", "rl infra", "jepa", "dexterous", "physics engine"],
     "negative_keywords": ["medical imaging", "weather forecast", ...],
     "domain_boost_keywords": ["robot", "manipulation", ...],
     "arxiv_categories": ["cs.RO", "cs.CV", "cs.AI", "cs.LG"],
     "min_score": 2,
-    "top_n": 30
+    "top_n": 10,
+    "candidate_pool_size": 30,
+    "research_interests": ["LLM RL and RL infrastructure", "JEPA world models", "Dexterous manipulation and physics simulation"],
+    "ranking": {"backend": "jev", "model": "jev-1.13.0", "batch_size": 30, "min_score": 2.0}
   },
   "automation": {
     "auto_refresh_indexes": true,
@@ -301,7 +318,7 @@ hash 路由：`route(pattern, handler)` + `resolve()`。列表/详情页复用�
 
 ### user_config.py
 
-Python 配置加载器，带缓存。提供 `load_user_config()` / `paths_config()` / `daily_papers_config()` / `automation_config()` 等便捷函数。会校验 `git_push` 不能在 `git_commit` 关闭时开启。
+Python 配置加载器，带缓存。配置按内置默认值 → 同目录模板 → 同目录 local → XDG 共享个人配置 → `DAILYPAPER_CONFIG` 合并，最后用 `OBSIDIAN_VAULT_PATH` 覆盖库路径。`python3 user_config.py` 输出有效配置和运行路径；`--init` 将当前配置写到共享个人配置（已存在则保留）。提供 `load_user_config()` / `paths_config()` / `daily_papers_config()` / `automation_config()` 等便捷函数。会校验 `git_push` 不能在 `git_commit` 关闭时开启。
 
 ### moc_builder.py
 

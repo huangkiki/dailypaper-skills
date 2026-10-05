@@ -1,300 +1,174 @@
 # dailypaper-skills 🗞️
 
-这是我自己平时读论文用的一套 Claude Code skills。
+**让你的 Agent 帮你追论文、挑重点，把值得读的研究留在自己的知识库里。**
 
-简单说，就是跟 Claude 说一句话，它会帮我从每天的新论文里筛一轮，挑出值得看的，再把重点论文读完、写成 Obsidian 笔记。日常不用记一堆命令，基本就是：
+每天的新论文很多，真正费时间的是判断：哪些和自己的研究有关，哪些值得读全文，读过以后又能留下什么。dailypaper-skills 把这些步骤连成一套研究工作流：按你的兴趣筛选论文，给出有依据的锐评，再精读重点论文，整理成带公式、图表和概念链接的笔记。
 
-```text
-今日论文推荐
-读一下这篇论文 https://arxiv.org/abs/2509.24527
-```
-
-如果你也有“每天想看看新论文，但不想每天从一堆页面里手动捞”的痛苦，这个仓库大概就是为这种场景准备的。
-
-> **🧊 Codex / Humanoid 适配**
-> 想看 Codex 适配版的话，可以先看 [`codex+humanoid`](https://github.com/huangkiki/dailypaper-skills/tree/codex%2Bhumanoid) 分支。
-
-> **🧩 顺手推荐**
-> 如果你主要在 Zotero 里读 PDF，可以搭配我另一个插件 [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar)。这个插件是在 Zotero 右侧加一个 AI 侧栏，适合边读边问、点译、全文翻译、截图追问、写回 Zotero 笔记。
->
-> ![Zotero AI Sidebar 阅读侧栏](https://raw.githubusercontent.com/huangkiki/zotero-ai-sidebar/master/docs/assets/zotero-real-overview.png)
->
-> 我的习惯是：用这个仓库做每日筛选和 Obsidian 深度笔记；真正在 Zotero 里打开 PDF 精读时，用 Zotero AI Sidebar 做即时问答和点译。
-
-> **🎬 视频演示**：[用 Claude Code 打造我的论文流水线](http://xhslink.com/o/1dhQCn40EWY)
-
-## ✨ 它会帮你做什么
-
-- 抓 HuggingFace Daily、Trending 和 arXiv 上的新论文。
-- 按你关心的方向打分，先筛掉明显不相关的。
-- 生成每日推荐页，分成“必读 / 值得看 / 可跳过”。
-- 对重点论文生成结构化笔记，包括方法、实验、公式、图表、局限和后续可追的问题。
-- 自动写进 Obsidian，并维护论文目录页和概念索引。
-- 如果你用 Zotero，也可以直接按标题搜索，或者按分类批量读论文。
-- 顺手还能抓 GitHub 周榜，看看最近哪些开源项目 star 涨得最快，并按你的方向标注相关性。
-
-最后在 Obsidian 里大概会长这样：
-
-```text
-ObsidianVault/
-├── DailyPapers/
-│   └── YYYY-MM-DD-论文推荐.md
-├── 论文笔记/
-│   ├── 具体分类/
-│   │   └── MethodName.md
-│   ├── _概念/
-│   │   └── ...概念笔记.md
-│   └── _待整理/
-└── ...
-```
-
-笔记模板可以看这里：[obsidian-templates/论文笔记模板.md](obsidian-templates/论文笔记模板.md)
-
-## 🧭 怎么用
-
-最常用的就是这几句：
+在你常用的 Agent 里说一句：
 
 ```text
 今日论文推荐
-过去3天论文推荐
-过去一周论文推荐
 ```
 
-想看看最近 GitHub 上 star 涨得最快的项目：
+你会得到 **一份最多 10 篇的论文推荐、明确的阅读优先级，以及“必读”论文的完整笔记**。推荐页链接到笔记，笔记链接到概念，方便以后做研究、查方法、回顾相关工作。
 
-```text
-GitHub 周榜
-过去一周 GitHub 热门
-GitHub 日榜
-```
+面向 **AI 与机器人研究者、研究生，以及需要长期跟进技术进展的工程师**。可安装到 Claude Code、Codex、Cursor、GitHub Copilot、Gemini CLI、OpenCode、OpenClaw；其他能读取指令、执行 Python 和访问文件的 Agent 也可接入。[兼容范围](docs/usage.md#agent-兼容说明)
 
-生成的榜单会写到 Obsidian 的 `GitHubTrending/` 目录，并按你的研究方向自动标注哪些和你相关。
+[你会得到什么](#-你会得到什么) · [有哪些 Skills](#-有哪些-skills) · [开始使用](#-开始使用) · [使用指南](docs/usage.md) · [视频演示](http://xhslink.com/o/1dhQCn40EWY)
 
-读单篇论文：
+<!-- JEV_BENCHMARK_START -->
+> **每日论文评分，API 标价折算省 99.47%，实测约快 20 倍。** 同一批 30 篇候选、两组均推荐 10 篇：GPT-6 Astra 约 **$0.1093 / 10.35 秒**，Jev 约 **$0.000576 / 0.52 秒**。2026-10-05 单次对照，计入主模型缓存；仅评分环节，费用为官方标准标价折算，非账户实际账单。[完整结果与复现](docs/jev-benchmark.md)
+<!-- JEV_BENCHMARK_END -->
 
-```text
-读一下这篇论文 https://arxiv.org/abs/2509.24527
-快速看一下这篇论文 ~/Downloads/paper.pdf
-批判性分析这篇论文 ~/Downloads/paper.pdf
-```
+## 🎁 你会得到什么
 
-如果你配好了 Zotero，也可以这样：
+### 🔎 1. 一份围绕你研究方向的每日阅读清单
 
-```text
-读一下 Zotero 里的 Diffusion Policy
-批量读一下 Zotero 里 VLA 分类下的论文
-```
+从 HuggingFace Daily / Trending 和 arXiv 发现论文，按你配置的研究兴趣筛选，结合推荐历史去重。默认每天最多 10 篇，相关论文不足时不凑数；漏看几天，也可以一次补看过去三天或一周。
 
-目录页一般会自动刷新。如果你手动移动过笔记，或者觉得目录没同步，再补一句：
+每篇推荐都要回答：**做了什么、为什么和你有关、有什么可借鉴、哪些地方还值得追问。** 来源、论文链接和已有笔记一起保留，方便回到原文。
 
-```text
-更新索引
-```
+### 🎯 2. 有态度、有依据的阅读优先级
 
-## ⚙️ 安装
+读推荐页，就能决定今天把注意力放在哪里：
 
-需要这些东西：
+| 分流 | 帮你做的决定 |
+| --- | --- |
+| 🔥 必读 | 值得展开读全文，工作流继续生成完整笔记 |
+| 👀 值得看 | 先了解方法与贡献，按需要进一步追问 |
+| 💤 可跳过 | 看清相关性或价值有限的原因，减少无效阅读 |
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-- [Obsidian](https://obsidian.md/)
-- [Python 3.8+](https://www.python.org/)
-- [`poppler-utils`](https://poppler.freedesktop.org/)，macOS 可以 `brew install poppler`
-- [Zotero](https://www.zotero.org/)，可选，但如果你已经用 Zotero 管论文会很方便
+锐评保留这套 skills 的个性：具体指出方法假设、实验范围、工程成本和结论边界。判断要有证据，信息不足时说明需要全文确认。Jev 负责判断主题相关性，研究价值由 Agent 结合论文信息分析。
 
-把 skills 复制到 Claude Code 的 skills 目录：
+### 📝 3. 能反复使用的论文与概念笔记
+
+对“必读”论文继续读全文，把研究问题、方法、关键公式、图表、实验结果和批判性思考整理成结构化 Markdown。遇到重要术语，补充 `[[概念]]` 链接和概念笔记，再把笔记链接回填到推荐页、刷新目录。
+
+下次读到相似方法时，可以顺着链接找到已有积累。支持检查已有论文笔记，也能从 Zotero 文献库开始阅读。
+
+**一次运行的交付物：**
+
+| 产物 | 打开后能看到什么 |
+| --- | --- |
+| 每日推荐页 | 今日锐评、阅读分流、逐篇点评、原文与笔记入口 |
+| 重点论文笔记 | 方法解析、公式说明、图表、实验与局限 |
+| 概念库与目录页 | 方法和术语之间的链接，持续积累的研究索引 |
+
+[查看完整论文笔记模板](obsidian-templates/论文笔记模板.md)。所有内容保存在你配置的本地目录；Obsidian 适合浏览双向链接，也可以用普通 Markdown 编辑器或项目自带的 Web Viewer 阅读。
+
+## 🧩 有哪些 Skills
+
+日常从三个入口开始：追新论文、读指定论文、看开源项目。其余技能在流程中自动衔接，也可以单独调用。
+
+| 你想做什么 | 对 Agent 说 | 对应 Skill |
+| --- | --- | --- |
+| 找到今天值得读的论文，并整理重点笔记 | `今日论文推荐` | [`daily-papers`](skills/daily-papers/SKILL.md) |
+| 补看最近的研究进展 | `过去一周论文推荐` | `daily-papers` |
+| 精读一篇论文 | `读一下这篇论文 <arXiv 链接或 PDF 路径>` | [`paper-reader`](skills/paper-reader/SKILL.md) |
+| 读自己的文献收藏 | `读一下 Zotero 里的 Diffusion Policy` | `paper-reader` |
+| 先抓住核心贡献 | `快速看一下这篇论文 <PDF 路径>` | `paper-reader` |
+| 跟进开源工具与仿真生态 | `GitHub 周榜` | [`github-trending`](skills/github-trending/SKILL.md) |
+| 整理已有知识库的导航 | `更新索引` | [`generate-mocs`](skills/generate-mocs/SKILL.md) |
+
+每日推荐内部由 [`daily-papers-fetch`](skills/daily-papers-fetch/SKILL.md)、[`daily-papers-review`](skills/daily-papers-review/SKILL.md)、[`daily-papers-notes`](skills/daily-papers-notes/SKILL.md) 完成抓取、点评和笔记生成。正常使用只需一句话；需要补跑某个阶段时，可以单独调用。
+
+### 🐙 也帮你发现论文之外的开源项目
+
+`GitHub 周榜` 汇总热门项目，标注与你研究方向的关系，并按主题检索仿真新项目和已有项目的近期更新。日榜、月榜也可用。
+
+默认兴趣包括 **大模型 RL、RL infra、世界模型 / JEPA、灵巧手操作与物理仿真**。MuJoCo、Newton、Isaac Sim、PhysX、Genesis、SuperDex、mjlab 等只是例子，发现范围也覆盖新的引擎、求解器和仿真基础设施。你可以配置自己的研究方向与项目检索主题。
+
+## 🚀 开始使用
+
+准备一个能读写文件、执行命令和联网的 Agent，以及 **Python 3.10+、Git、curl**。PDF 文字与图片提取需要 **Poppler**；Obsidian 和 Zotero 按需使用。[完整环境说明](docs/usage.md#1-准备运行环境)
+
+### 第一步：安装技能包
 
 ```bash
 git clone https://github.com/huangkiki/dailypaper-skills.git
 cd dailypaper-skills
-
-mkdir -p ~/.claude/skills
-cp -r ./skills/* ~/.claude/skills/
+python3 install.py --agent codex
 ```
 
-再准备一下 Obsidian 目录。把下面的 `VAULT` 改成你自己的库路径：
+将 `codex` 换成你使用的 Agent：`claude`、`cursor`、`copilot`、`gemini`、`opencode` 或 `openclaw`。Windows 可将 `python3` 换成 `py -3`。安装器会一起安装七个技能及共享依赖。
+
+> [多 Agent、自定义目录与升级方法](docs/usage.md#2-安装到你使用的-agent)
+
+### 第二步：告诉它你的研究兴趣
+
+创建个人配置：
 
 ```bash
-VAULT=~/ObsidianVault
-
-mkdir -p "$VAULT/DailyPapers" \
-  "$VAULT/GitHubTrending" \
-  "$VAULT/论文笔记/_概念/0-待分类" \
-  "$VAULT/论文笔记/_待整理"
+python3 skills/_shared/user_config.py --init
 ```
 
-我自己在本地日常用的时候，通常会这样启动 Claude Code：
+然后让 Agent 帮你完成设置：
+
+```text
+帮我配置 dailypaper-skills。
+我的笔记库在 /path/to/ObsidianVault。
+我关注大模型强化学习、RL infra、世界模型和 JEPA、灵巧手操作与物理仿真。
+请使用跨 Agent 的共享配置，每天最多推荐 10 篇。
+```
+
+默认的 Jev 语义评分需要在启动 Agent 的环境中设置 `TYPESAFE_API_KEY`。点评与精读使用宿主 Agent 的模型。没有 TypeSafe key 时，也可以显式选择关键词筛选模式。[密钥设置与关键词模式](docs/usage.md#3-配置并开始使用)
+
+### 第三步：开始你的第一次推荐
+
+刷新或重启 Agent 会话，输入：
+
+```text
+今日论文推荐
+```
+
+Agent 会依次完成筛选、点评和重点笔记，并返回产物位置。也可以直接给它一篇论文开始精读。以上都是 **Agent 对话指令**。
+
+## ⚡ 为什么用 Jev 做筛选
+
+每天重复发生的相关性评分交给 Jev，把宿主模型用于论文点评和全文精读。相同 30 篇候选、两组都推荐 10 篇的一次真实 API 对照中：
+
+| 评分环节 | GPT-6 Astra | Jev 1.13.0 |
+| --- | ---: | ---: |
+| 官方标准 API 标价折算 | $0.109264 | $0.000576408 |
+| API 调用耗时 | 10.35 秒 | 0.52 秒 |
+| 总 token | 11,932 | 14,198 |
+
+**费用优势来自更低的单价。** Jev 在这次对照中使用了更多 token，但评分费用按标价折算降低 99.47%，两组入选重合 9/10。相对首版 Jev 请求，优化后的 token 用量减少了 25.12%。
+
+这是 2026-10-05 的单次评分测量，计入主模型缓存；不代表整个阅读流程的费用，也不是订阅账户实际扣款。重合率不等于人工质量评价。[原始请求、用量、价格来源与复现方法](docs/jev-benchmark.md)
+
+## 📚 接入你已有的阅读习惯
+
+- **Obsidian**：推荐页、论文笔记、概念库和目录页相互链接；产物是可自行管理的 Markdown。
+- **Zotero**：按标题查找文献，或按分类批量阅读，利用已有 PDF 收藏。
+- **浏览器**：可选 [Web Viewer](docs/usage.md#可选在浏览器里看笔记) 浏览同一份笔记与公式。
+- **多个 Agent**：共用研究兴趣和笔记库配置；宿主需要提供文件、命令和网络能力。[接入与验证范围](docs/agents.md)
+
+我也会搭配 [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar)：用这套 skills 筛选和积累研究笔记，在 PDF 阅读时用 Sidebar 即时问答、点译与追问。
+
+## 💬 使用前你可能想知道
+
+**必须安装 Obsidian 吗？** 不需要，配置一个 Markdown 输出目录即可。Zotero 也只在读取个人文献库时需要。
+
+**会自动每天运行吗？** 默认由你发起。需要定时运行时，可以使用宿主或系统调度；安装不会创建后台任务。Git 自动提交、推送默认关闭。
+
+**所有 Agent 都能用吗？** 技能包按文件与脚本组织，提供多种安装目标；纯聊天、无法访问文件或运行命令的客户端不能独立执行。安装与脚本测试不等于所有客户端都完成了端到端验证。
+
+**想改研究方向、升级或排查失败？** 查看 [使用指南](docs/usage.md)，包含完整配置、安装目录、迁移、并行运行与常见问题。
+
+## 🛠️ 开发与贡献
+
+[架构说明](ARCHITECTURE.md) · [Agent 接入](docs/agents.md) · [评分基准](docs/jev-benchmark.md)
 
 ```bash
-claude --dangerously-skip-permissions
+python3 -m pip install -r web-viewer/requirements.txt
+python3 -m unittest discover -s tests -v
 ```
 
-这样会少很多权限确认，但它确实会跳过部分权限检查。所以更适合自己的个人机器，不建议在不熟悉的机器或共享环境里直接这么跑。
-
-## 配置
-
-配置文件在：
-
-```text
-~/.claude/skills/_shared/user-config.json
-```
-
-你可以自己改，也可以直接让 Claude 帮你改，比如：
-
-```text
-帮我配置 dailypaper-skills。我的 Obsidian 库在 XXX，研究方向是 robot learning、VLA、diffusion policy。
-```
-
-主要会改这几项：
-
-| 配置项 | 说明 |
-| --- | --- |
-| `paths.obsidian_vault` | 你的 Obsidian 库路径 |
-| `paths.zotero_db` | Zotero 数据库路径，不用 Zotero 可以留空 |
-| `paths.zotero_storage` | Zotero 附件存储路径 |
-| `daily_papers.keywords` | 你关心的研究方向，用来给论文加分 |
-| `daily_papers.negative_keywords` | 你不想看的方向 |
-| `daily_papers.domain_boost_keywords` | 额外加分的领域词 |
-
-Zotero 分类批量阅读不需要你另外写映射文件。只要 `paths.zotero_db` 和 `paths.zotero_storage` 配好，脚本会直接从 Zotero 分类树里查。
-
-## 🖥️ 网页可视化（可选）
-
-如果你想在浏览器里翻每日推荐、论文笔记、概念库和 GitHub 周榜，仓库自带一个轻量 Web Viewer（FastAPI + 原生前端，无需打包）。
-
-```bash
-cd web-viewer
-pip install -r requirements.txt
-python3 app.py
-```
-
-然后打开 `http://localhost:8080`。它会自动读取你 `~/.claude/skills/_shared/user-config.json` 里的 `obsidian_vault`，把这些内容渲染出来：
-
-- 📰 **Daily Papers**：每日/每周推荐，带“必读 / 值得看 / 可跳过”分流卡片。
-- 🔥 **GitHub Trending**：`GitHubTrending/` 里的周榜笔记。
-- 📝 **Paper Notes** / 🧠 **Concepts**：论文笔记和概念库，支持 `[[双向链接]]` 跳转、LaTeX 公式、全文搜索。
-
-页面里还内置了一个 Claude 对话框，可以直接在浏览器里喊“今日论文推荐”“GitHub 周榜”触发流程（它在后台调用本机的 `claude` CLI）。
-
-## 我一般怎么搭配 Zotero AI Sidebar
-
-这个仓库和 [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar) 不是替代关系，更像是两个不同位置的工具。
-
-`dailypaper-skills` 更适合做这些事：
-
-- 每天批量筛新论文。
-- 把一篇论文完整读完，沉淀成 Obsidian 笔记。
-- 顺手维护概念库和目录页。
-- 对 Zotero 里某个分类的论文做批量整理。
-
-Zotero AI Sidebar 更适合在读 PDF 的时候用：
-
-- 看到一段看不顺，直接点译。
-- 围绕当前论文提问，不用手动复制标题、摘要、选区。
-- 截图问图表、公式或实验结果。
-- 把回答写回 Zotero 子笔记。
-
-所以我自己的工作流通常是：
-
-1. 早上跑 `今日论文推荐`，先知道今天有没有值得看的。
-2. 对特别重要的论文跑 `读一下这篇论文 ...`，生成 Obsidian 深度笔记。
-3. 真正在 Zotero 里打开 PDF 细读时，用 Zotero AI Sidebar 做临场问答、点译和截图追问。
-4. 一段时间后，对 Zotero 某个分类跑批量阅读，把已有文献库再整理进 Obsidian。
-
-## 它内部大概怎么跑
-
-`今日论文推荐` 其实会拆成三步：
-
-1. **抓取**：从 HuggingFace Daily、Trending 和 arXiv API 抓候选论文，按你的关键词打分去重。
-2. **点评**：Claude 读候选列表，分成“必读 / 值得看 / 可跳过”，写到 Obsidian 的 `DailyPapers/` 目录。
-3. **笔记**：对“必读”论文逐篇调用 `paper-reader`，生成完整论文笔记，补概念库，再刷新目录页。
-
-正常不用手动跑这三步。如果你只是想调试某一步，也可以说：
-
-```text
-跑一下论文抓取
-跑一下论文点评
-跑一下论文笔记
-```
-
-`读一下这篇论文 ...` 走的是 `paper-reader`。它支持 arXiv 链接、本地 PDF、Zotero 搜索和 Zotero 分类。生成笔记时会尽量从 arXiv HTML、项目主页和 PDF 里把图表找出来，写完后还会检查图片链接，坏掉的外链会尽量下载到本地。
-
-`更新索引` 走的是 `generate-mocs`，会递归扫描论文笔记和概念库，生成 Obsidian 可用的目录页。
-
-更多实现细节见 [ARCHITECTURE.md](ARCHITECTURE.md)。
-
-## 🔒 默认不会动你的 git
-
-默认配置比较保守：
-
-- 自动刷新 Obsidian 目录页：开。
-- 自动 git commit：关。
-- 自动 git push：关。
-
-也就是说，它会生成和更新 Markdown，但不会默认提交或推送你的 Obsidian 仓库。
-
-如果你的 Obsidian 库已经用 git 管理，并且想让流程结束后自动提交，可以自己打开配置。笔记多了以后，有个版本历史还是很安心的。
-
-## 仓库里有什么
-
-```text
-skills/
-├── daily-papers/          # 每日推荐总入口
-├── paper-reader/          # 单篇论文阅读与笔记生成
-├── generate-mocs/         # Obsidian 目录页生成
-├── github-trending/       # GitHub 周榜（star 涨最快的项目）
-├── daily-papers-fetch/    # 内部：抓取候选论文
-├── daily-papers-review/   # 内部：生成推荐点评
-├── daily-papers-notes/    # 内部：生成重点论文笔记
-└── _shared/               # 共享配置和索引脚本
-
-web-viewer/                # 可选：本地网页可视化（FastAPI）
-obsidian-templates/
-└── 论文笔记模板.md
-```
-
-日常真正会直接用到的，基本就是：
-
-- `daily-papers`
-- `paper-reader`
-- `github-trending`
-- `generate-mocs`
-
-另外几个是流水线内部拆出来的步骤，主要方便调试和重跑。
-
-## FAQ
-
-**可以一步跑完整流程吗？**
-
-可以。直接说 `今日论文推荐`。
-
-**不用 Zotero 可以吗？**
-
-可以。每日推荐不依赖 Zotero；单篇阅读也支持 arXiv 链接和本地 PDF。Zotero 主要是用来搜索已有文献库、读取分类和批量处理。
-
-**不用 Obsidian 可以吗？**
-
-也可以。输出本质上就是 Markdown 文件。不过如果你想用 `[[双向链接]]`、图谱、概念库和目录页，Obsidian 会更顺手。
-
-**能每天自动跑吗？**
-
-可以。你可以让 Claude 按你的系统环境配置定时任务，比如 macOS 的 `launchd` 或 Linux 的 `cron`。定时任务建议只触发 `今日论文推荐`，不要手写三条内部命令。
-
-**生成的笔记能直接放进论文写作里吗？**
-
-建议把它当成 related work 整理、阅读记录和追问提纲。AI 生成内容可能会有误，正式写作前还是要回到原文核验。
-
-## 免责声明
-
-这是我个人研究工作流的开源整理，不是一个保证完全稳定的产品。AI 生成的推荐、点评和笔记可能有事实错误、遗漏或误读，更适合作为辅助工具，而不是替代自己的研究判断。
-
-如果你遇到问题，欢迎提 issue、PR，或者直接让 AI 和你一起改。
-
-## 支持这个项目
-
-如果这套 workflow 对你有帮助，欢迎点 Star、提 PR，或者分享你的适配版本。像 [`codex+humanoid`](https://github.com/huangkiki/dailypaper-skills/tree/codex%2Bhumanoid) 这种兼容性适配也很欢迎。
+欢迎分享使用方式、适配反馈，或提交 Issue / PR。反馈问题时请提供 Agent 与系统版本、失败阶段及去除敏感信息后的日志。
 
 [![Star History Chart](https://star-history.dera.page/svg?repos=huangkiki/dailypaper-skills&type=Date)](https://star-history.dera.page/#huangkiki/dailypaper-skills&Date)
 
-## License
+## 📄 License
 
 Apache-2.0. See [LICENSE](LICENSE).

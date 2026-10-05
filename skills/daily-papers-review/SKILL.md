@@ -7,6 +7,10 @@ description: |
   触发词："论文点评"、"跑一下论文点评"
 ---
 
+## 执行环境
+
+开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。
+
 > **开始前**: 先说一声 "开始点评论文 🔪" 并告知今天日期。
 
 # 论文点评 (Review + Save)
@@ -15,7 +19,7 @@ description: |
 
 ## Step 0: 读取共享配置
 
-先读取 `../_shared/user-config.json`，如果 `../_shared/user-config.local.json` 存在，再用它覆盖默认值。
+运行 `python3 ../_shared/user_config.py`，使用其输出的合并配置（含个人配置和环境变量覆盖）。
 
 显式生成并在后续统一使用这些变量：
 
@@ -26,7 +30,7 @@ description: |
 - `AUTO_REFRESH_INDEXES`
 - `GIT_COMMIT_ENABLED`
 - `GIT_PUSH_ENABLED`
-- `ENRICHED_INPUT = /tmp/daily_papers_enriched.json`
+- `ENRICHED_INPUT = {TEMP_DIR}/daily_papers_enriched.json`
 
 其中：
 
@@ -39,7 +43,7 @@ description: |
 
 ## 前置检查
 
-1. 检查 `/tmp/daily_papers_enriched.json` 是否存在
+1. 检查 `{TEMP_DIR}/daily_papers_enriched.json` 是否存在
 2. 如果不存在，告知用户需要先运行 `跑一下论文抓取`，然后停止
 
 ## 工作流程
@@ -75,7 +79,7 @@ description: |
 #### 点评人设
 
 你是一个毒舌但眼光极准的 AI 论文审稿人，说话像一个见多识广、对灌水零容忍的 senior researcher。
-用户的研究方向是 embodied AI、world model、diffusion model。
+用户研究方向以有效配置 `daily_papers.research_interests` 为准。默认关注大模型 RL、RL infra、世界模型 / JEPA、灵巧手操作和广泛仿真生态。仿真项目名是示例，不能当作白名单。
 
 #### 数据来源提醒
 
@@ -88,7 +92,7 @@ description: |
 
 #### 兜底过滤
 
-写评过程中如果发现某篇论文与 embodied AI / world model / diffusion for robotics 完全无关（如医学影像、天气预报、语音合成、纯 LLM agent、纯 NLP、GUI agent 等），直接跳过不写。**补货规则**：从完整的已富化论文中按 score 顺序选取，跳过不相关的，直到凑满 20 篇或候选池耗尽。如果候选池已空，有多少写多少。在末尾「被排除的论文」一节注明被跳过的论文标题和跳过原因。
+只评价抓取阶段已选中并富化的论文，默认每天最多 10 篇。若发现与配置中的任何兴趣均无关，跳过并在末尾注明标题和原因；不为凑数追加候选。不因论文属于 LLM、NLP 或 agent 方向就一概排除。Jev 分数是主题相关性，不是研究质量；confidence 反映分布集中程度，不是正确概率。保留本文基于证据的点评、分流和局限分析。
 
 #### 铁律：基于事实评价
 
@@ -190,7 +194,7 @@ description: |
   2. 关键技术组件（架构、损失函数、训练策略），首次出现的技术名词用 [[]] 双链标注
   3. 与现有方法的核心区别
 - **对比方法/Baselines**: 从方法名列表中提取论文对比了哪些方法、借鉴了哪些前人工作。写清楚具体方法名，并用 [[]] 双链标注（如 [[OpenVLA]]、[[DreamerV3]]、[[MuJoCo]]）。区分"对比 baseline"和"借鉴/基于的方法"
-- **借鉴意义**: 对做 embodied AI / world model / diffusion policy 的人有什么用。没用就直说
+- **借鉴意义**: 对配置中对应研究方向有什么具体用处（如 LLM RL、RL infra、JEPA、灵巧手或仿真）。没用就直说
 - **锐评**: 这篇到底行不行？方法有没有硬伤？claim 和证据匹配吗？跟已有工作的本质区别在哪？评估范围够不够？
 - **关联笔记**: 用 [[笔记名]] 双链标出关联的已有笔记/概念，写一句话说明关联。没有就不写
 - 💡 **想精读？** 运行：`读一下 论文标题`    ← 仅对"值得看"等级的论文显示，"必读"会自动生成笔记，"可跳过"不需要
@@ -213,7 +217,7 @@ description: |
 ```yaml
 ---
 date: YYYY-MM-DD
-keywords: world model, diffusion model, embodied ai, 3d gaussian splatting, 4d gaussian splatting, sim-to-real, sim2real, robot simulation
+keywords: [从有效配置 daily_papers.keywords 中填写本次实际相关的关键词]
 tags: [daily-papers, auto-generated]
 ---
 ```
@@ -255,10 +259,10 @@ cd {VAULT_PATH} && git add "{daily_papers_folder}/YYYY-MM-DD-论文推荐.md" "{
 完成后告知用户：
 - 推荐了多少篇论文
 - 必读/值得看/可跳过各多少篇
-- 提示运行下一步：`跑一下论文笔记`
+- 总入口调用时自动继续笔记；用户单独调用本阶段时，提示下一步：`跑一下论文笔记`
 
 ## 注意事项
 
-- 如果 `/tmp/daily_papers_enriched.json` 不存在，必须先运行 `跑一下论文抓取`
+- 如果 `{TEMP_DIR}/daily_papers_enriched.json` 不存在，必须先运行 `跑一下论文抓取`
 - 不生成论文笔记、不补充概念库（那是第 3 步的事）
 - 默认不做 git commit / push；这是显式开启的高级能力

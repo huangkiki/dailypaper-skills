@@ -6,6 +6,7 @@ import json
 import os
 import pathlib
 import re
+import sys
 from typing import Optional
 
 from fastapi import FastAPI, Query
@@ -17,22 +18,27 @@ from pydantic import BaseModel
 # Configuration
 # ---------------------------------------------------------------------------
 
+_SHARED_DIR = pathlib.Path(__file__).resolve().parent.parent / "skills" / "_shared"
+sys.path.insert(0, str(_SHARED_DIR))
+from user_config import load_user_config, shared_config_path
+
+
 def load_config() -> dict:
-    """按优先级查找 user-config.json：
-    1. ~/.claude/skills/_shared/user-config.json（安装后用户实际编辑的部署副本）
-    2. ../skills/_shared/user-config.json（仓库自带模板）
-    找到第一个可解析且 obsidian_vault 存在的就用它。
-    """
+    """Use the skills' shared loader, retaining the legacy Claude config fallback."""
     candidates = [
-        os.path.expanduser("~/.claude/skills/_shared/user-config.json"),
-        str(pathlib.Path(__file__).resolve().parent.parent / "skills/_shared/user-config.json"),
+        pathlib.Path.home() / ".claude/skills/_shared",
+        _SHARED_DIR,
     ]
     fallback = {}
-    for cfg_path in candidates:
+    for config_dir in candidates:
+        if not any((config_dir / name).is_file() for name in ("user-config.json", "user-config.local.json")):
+            continue
         try:
-            with open(cfg_path) as f:
-                cfg = json.load(f)
-        except Exception:
+            cfg = load_user_config(config_dir)
+        except (OSError, ValueError):
+            # An explicit or shared config error must not silently select another vault.
+            if os.environ.get("DAILYPAPER_CONFIG") or shared_config_path().exists():
+                raise
             continue
         if not fallback:
             fallback = cfg

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import copy
 import json
 import os
@@ -13,8 +14,11 @@ def get_temp_dir() -> Path:
 
     On Windows: ~/tmp/ (e.g., C:/Users/username/tmp/)
     On Linux/Mac: /tmp/
+    DAILYPAPER_TEMP_DIR overrides both defaults for isolated runs.
     """
-    if sys.platform == 'win32':
+    if os.environ.get("DAILYPAPER_TEMP_DIR"):
+        tmp_dir = Path(os.environ["DAILYPAPER_TEMP_DIR"]).expanduser()
+    elif sys.platform == 'win32':
         # Windows: use user's home directory under ~/tmp
         tmp_dir = Path.home() / 'tmp'
     else:
@@ -33,82 +37,116 @@ DEFAULT_CONFIG = {
         "github_trending_folder": "GitHubTrending",
         "concepts_folder": "_概念",
         "zotero_db": "~/Zotero/zotero.sqlite",
-        "zotero_storage": "~/Zotero/storage",
+        "zotero_storage": "~/Zotero/storage"
     },
     "daily_papers": {
         "keywords": [
+            "reinforcement learning",
+            "rlhf",
+            "rlvr",
+            "grpo",
+            "rl infrastructure",
+            "rl infra",
+            "distributed rollout",
+            "policy optimization",
+            "verl",
+            "slime",
+            "areal",
             "world model",
-            "diffusion model",
-            "embodied ai",
-            "3d gaussian splatting",
-            "4d gaussian splatting",
-            "sim-to-real",
-            "sim2real",
-            "robot simulation",
+            "jepa",
+            "joint embedding predictive",
+            "latent dynamics",
+            "dexterous",
+            "in-hand manipulation",
+            "multi-finger",
+            "robot hand",
+            "hand simulation",
+            "contact-rich",
+            "differentiable simulation",
+            "gpu simulation",
+            "batched simulation",
+            "superdex",
+            "mjlab",
+            "unlib",
+            "unilab",
+            "unisim",
+            "mjbatch",
+            "mujoco",
+            "physics engine",
+            "physics simulator",
+            "robotics simulation",
+            "simulation framework",
+            "simulation engine",
+            "rigid body",
+            "soft body",
+            "deformable simulation",
+            "contact solver",
+            "gpu physics",
+            "parallel simulation",
+            "newton",
+            "isaac sim",
+            "isaacsim",
+            "physx",
+            "genesis"
         ],
         "negative_keywords": [
             "medical imaging",
             "weather forecast",
-            "climate",
-            "pet restoration",
-            "mri",
-            "ct scan",
-            "pathology",
-            "diagnosis",
-            "protein",
+            "climate prediction",
+            "protein folding",
             "drug discovery",
-            "molecular",
-            "audio generation",
-            "music generation",
             "speech synthesis",
-            "text-to-speech",
-            "speech recognition",
-            "voice cloning",
-            "coding agent",
-            "code agent",
-            "code generation",
-            "software engineering agent",
-            "gui agent",
-            "computer use",
-            "web agent",
-            "browser agent",
-            "document parsing",
-            "document understanding",
-            "ocr",
-            "rag framework",
-            "retrieval augmented",
-            "retrieval-augmented",
-            "llm memory",
-            "long-term memory for llm",
-            "text-to-sql",
-            "code repair",
-            "code review",
-            "trading",
-            "financial",
+            "music generation"
         ],
         "domain_boost_keywords": [
-            "robot",
+            "rollout",
+            "post-training",
+            "reasoning",
+            "contact dynamics",
+            "sim-to-real",
+            "sim2real",
+            "physics simulation",
             "manipulation",
-            "grasping",
-            "locomotion",
-            "navigation",
-            "planning",
-            "reinforcement learning",
-            "policy learning",
-            "visuomotor",
-            "action prediction",
+            "grasping"
         ],
-        "arxiv_categories": ["cs.RO", "cs.CV", "cs.AI", "cs.LG"],
+        "arxiv_categories": [
+            "cs.RO",
+            "cs.LG",
+            "cs.AI",
+            "cs.CL",
+            "cs.DC",
+            "cs.CV"
+        ],
         "min_score": 2,
-        "top_n": 30,
+        "top_n": 10,
+        "research_interests": [
+            "Reinforcement learning for large language models: RLHF, RLVR, GRPO, policy optimization, reasoning and agent training.",
+            "RL infrastructure: distributed training, rollout generation, inference/training scheduling, scalable RL systems such as verl, slime and AReaL.",
+            "World models, especially the JEPA family: I-JEPA, V-JEPA, V-JEPA 2, joint-embedding predictive architectures and action-conditioned latent prediction.",
+            "Dexterous manipulation tasks: multi-finger hand control, in-hand manipulation, grasping, contact-rich tasks and robot learning.",
+            "Dexterous-hand physics simulation and sim-to-real: contact dynamics, differentiable simulation, GPU parallel environments and batched simulation.",
+            "Physics simulation engines and emerging simulation infrastructure for robotics and embodied AI: rigid/soft-body dynamics, contact solvers, GPU parallel simulation, differentiable simulation and sim-to-real. Examples include MuJoCo, Newton, Isaac Sim, PhysX, Genesis, SuperDex, mjlab, unlib, UniLab and mjbatch. These are examples, not a whitelist: discover relevant new projects and ecosystem advances too."
+        ],
+        "candidate_pool_size": 30,
+        "ranking": {
+            "backend": "jev",
+            "model": "jev-1.13.0",
+            "batch_size": 30,
+            "min_score": 2.0
+        },
+        "project_queries": [
+            "\"physics simulation\" in:name,description",
+            "\"physics engine\" in:name,description",
+            "\"robot simulation\" in:name,description",
+            "\"differentiable simulation\" in:name,description"
+        ]
     },
     "automation": {
         "auto_refresh_indexes": True,
         "git_commit": False,
-        "git_push": False,
-    },
+        "git_push": False
+    }
 }
-
 
 def _deep_merge(base: dict, override: dict) -> dict:
     for key, value in override.items():
@@ -119,19 +157,39 @@ def _deep_merge(base: dict, override: dict) -> dict:
     return base
 
 
-@lru_cache(maxsize=1)
-def load_user_config() -> dict:
-    config = copy.deepcopy(DEFAULT_CONFIG)
-    config_dir = Path(__file__).resolve().parent
+def shared_config_path() -> Path:
+    """One optional personal configuration, independent of the agent installation."""
+    root = Path(os.environ.get("XDG_CONFIG_HOME") or "~/.config").expanduser()
+    return root / "dailypaper-skills" / "user-config.json"
 
-    for filename in ("user-config.json", "user-config.local.json"):
-        config_path = config_dir / filename
+
+@lru_cache(maxsize=1)
+def load_user_config(config_dir: Path | None = None) -> dict:
+    config = copy.deepcopy(DEFAULT_CONFIG)
+    config_dir = Path(config_dir) if config_dir is not None else Path(__file__).resolve().parent
+    config_paths = [config_dir / name for name in ("user-config.json", "user-config.local.json")]
+    config_paths.append(shared_config_path())
+    explicit = os.environ.get("DAILYPAPER_CONFIG")
+    if explicit:
+        explicit_path = Path(explicit).expanduser()
+        if not explicit_path.is_file():
+            raise FileNotFoundError(f"DAILYPAPER_CONFIG does not point to a file: {explicit_path}")
+        config_paths.append(explicit_path)
+
+    for config_path in config_paths:
         if not config_path.exists():
             continue
         with config_path.open("r", encoding="utf-8") as f:
             loaded = json.load(f)
-        if isinstance(loaded, dict):
-            _deep_merge(config, loaded)
+        if not isinstance(loaded, dict):
+            raise ValueError(f"Configuration must be a JSON object: {config_path}")
+        for section in ("paths", "daily_papers", "automation"):
+            if section in loaded and not isinstance(loaded[section], dict):
+                raise ValueError(f"{section} must be a JSON object: {config_path}")
+        _deep_merge(config, loaded)
+
+    if os.environ.get("OBSIDIAN_VAULT_PATH"):
+        config["paths"]["obsidian_vault"] = os.environ["OBSIDIAN_VAULT_PATH"]
 
     return config
 
@@ -211,3 +269,35 @@ def temp_file_path(filename: str) -> Path:
         enriched_path = temp_file_path('daily_papers_enriched.json')
     """
     return temp_dir() / filename
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Print effective configuration and resolved runtime paths.")
+    parser.add_argument("--init", action="store_true", help="Create shared personal config if absent; never overwrite it")
+    args = parser.parse_args()
+    config = copy.deepcopy(load_user_config())
+    if args.init:
+        path = shared_config_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with path.open("x", encoding="utf-8") as stream:
+                json.dump(config, stream, ensure_ascii=False, indent=2)
+                stream.write("\n")
+        except FileExistsError:
+            print(f"Existing configuration preserved: {path}")
+        else:
+            print(f"Created personal configuration: {path}")
+        return
+    config["automation"] = automation_config()
+    for key in ("obsidian_vault", "zotero_db", "zotero_storage"):
+        config["paths"][key] = str(_expand(config["paths"][key]))
+    config["runtime"] = {
+        "python": sys.executable,
+        "temp_dir": str(temp_dir()),
+        "shared_config": str(shared_config_path()),
+    }
+    print(json.dumps(config, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

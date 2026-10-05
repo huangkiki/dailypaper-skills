@@ -7,6 +7,10 @@ description: |
   触发词："批量笔记"、"跑一下论文笔记"
 ---
 
+## 执行环境
+
+开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。
+
 > **开始前**: 先说一声 "开始整理笔记 📝" 并告知今天日期。
 
 # 论文笔记 (Concepts + Notes + Backfill)
@@ -15,7 +19,7 @@ description: |
 
 ## Step 0: 读取共享配置
 
-先读取 `../_shared/user-config.json`，如果 `../_shared/user-config.local.json` 存在，再用它覆盖默认值。
+运行 `python3 ../_shared/user_config.py`，使用其输出的合并配置（含个人配置和环境变量覆盖）。
 
 显式生成并在后续统一使用这些变量：
 
@@ -26,7 +30,7 @@ description: |
 - `AUTO_REFRESH_INDEXES`
 - `GIT_COMMIT_ENABLED`
 - `GIT_PUSH_ENABLED`
-- `ENRICHED_INPUT = /tmp/daily_papers_enriched.json`
+- `ENRICHED_INPUT = {TEMP_DIR}/daily_papers_enriched.json`
 
 其中：
 
@@ -39,7 +43,7 @@ description: |
 
 ## 前置检查
 
-1. 检查 `/tmp/daily_papers_enriched.json` 是否存在
+1. 检查 `{TEMP_DIR}/daily_papers_enriched.json` 是否存在
 2. 检查今天的推荐文件 `{DAILY_PAPERS_PATH}/YYYY-MM-DD-论文推荐.md` 是否存在
 3. 如果任一不存在，告知用户需要先运行前置步骤，然后停止
 
@@ -49,7 +53,7 @@ description: |
 
 **1a: 提取概念列表**
 1. 扫描今天的推荐文件，提取所有 `[[...]]` 链接
-2. 额外从 `/tmp/daily_papers_enriched.json` 的 `method_names` 列表中提取所有方法名
+2. 额外从 `{TEMP_DIR}/daily_papers_enriched.json` 的 `method_names` 列表中提取所有方法名
 3. 合并去重
 
 **1b: 过滤**
@@ -75,7 +79,7 @@ description: |
    - 对已有 `📒 **笔记**` 标记的论文，用 Glob 找到对应笔记文件，检查行数
    - **行数 < 100 的视为骨架笔记，必须重新生成**（删除旧文件，重新调用 paper-reader）
    - 行数 >= 100 且包含 `## 关键公式` 和 `## 关键图表` 的才算合格，可以跳过
-3. 对每篇需要生成/重新生成的论文，使用 Task agent 调用 `/paper-reader` skill（传入 arXiv 链接）
+3. 对每篇需要生成/重新生成的论文，执行 [paper-reader](../paper-reader/SKILL.md)（传入 arXiv 链接）
    - **不要指定固定的输出路径**，让 paper-reader 自行决定文件名和分类目录
    - paper-reader 会用方法名缩写作为文件名（如 `DAPL.md`），并自动分类到正确子目录
    - agent 完成后，用 `find` 或 `Glob` 找到实际生成的笔记文件路径和文件名，记录下来供 Step 3 回填用
@@ -87,9 +91,9 @@ description: |
 
 #### ⚠️ 笔记质量硬性要求
 
-**绝对禁止自己手写简化版笔记。每篇论文必须通过 Task agent 调用 `/paper-reader` skill 生成。**
+**每篇论文必须遵循 `paper-reader` 的完整工作流，不能用简化笔记替代。**
 不要因为"怕 context overflow"或"论文太多"就自己写个 70 行的骨架糊弄过去。
-paper-reader 在独立的 Task agent 中运行，不会占用主 agent 的 context。
+宿主支持且允许子 Agent 时，可用独立上下文运行 paper-reader；否则读取其 `SKILL.md` 和引用模板，在当前会话逐篇执行，并及时保存进度。
 
 笔记质量由 paper-reader skill 自身保证（模板、公式、图片、概念链接等规则均在 paper-reader 中定义）。
 
@@ -177,7 +181,7 @@ cd {VAULT_PATH} && git add -A && git commit -m "daily papers: notes YYYY-MM-DD"
 ## 注意事项
 
 - 如果前置文件不存在，必须先运行前面的步骤
-- `/paper-reader` skill 会自动处理概念库补充，不要重复创建
+- `paper-reader` skill 会自动处理概念库补充，不要重复创建
 - 仅为"必读"论文生成笔记，"值得看"不生成，耗时正常，**不是跳过的理由**
 - 默认自动刷新目录页，但默认不做 git commit / push
 - **绝对禁止**以下偷懒行为：

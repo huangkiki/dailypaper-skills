@@ -9,9 +9,11 @@ description: |
   "批判性分析这篇论文 ...", "读一下 Zotero 里的 XXX", "批量读一下 Zotero 里 VLA 分类下的论文"
 
   **重要触发词**: "读一下 XXX"、"读一下这篇"、"帮我读" → 必须调用此 skill
-context: fork
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
 ---
+
+## 执行环境
+
+开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。
 
 > **开始前**: 先跟用户打个招呼 🐕
 
@@ -21,7 +23,7 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
 
 ## Step 0: 读取共享配置
 
-先读取 `../_shared/user-config.json`，如果 `../_shared/user-config.local.json` 存在，再用它覆盖默认值。
+运行 `python3 ../_shared/user_config.py`，使用其输出的合并配置（含个人配置和环境变量覆盖）。
 
 显式生成并在后续统一使用这些变量：
 

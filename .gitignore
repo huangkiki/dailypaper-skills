@@ -12,3 +12,7 @@ __pycache__/
 *.swp
 *~
 .DS_Store
+
+# Personal configuration belongs outside version control
+skills/_shared/user-config.local.json
+.venv/

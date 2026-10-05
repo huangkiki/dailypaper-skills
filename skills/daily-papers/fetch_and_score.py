@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-fetch_and_score.py — Phase 1+2: Fetch, score, merge, dedup, select top 30.
+fetch_and_score.py — Fetch a keyword shortlist, then let Jev select daily papers.
 
-Replaces the two LLM Task Agents with pure Python. Zero token cost.
+Keyword retrieval uses no model tokens. Jev semantic ranking reports its API usage.
 
 Usage:
-    python3 fetch_and_score.py > /tmp/daily_papers_top30.json
-    python3 fetch_and_score.py --date 2026-02-25 > /tmp/daily_papers_top30.json
-    python3 fetch_and_score.py --days 7 > /tmp/daily_papers_top30.json
+    python3 fetch_and_score.py --output selected.json
+    python3 fetch_and_score.py --date 2026-02-25 --output selected.json
+    python3 fetch_and_score.py --ranker keyword --output selected.json
 
-Stderr: progress logs.  Stdout: JSON array of top papers (30 * days).
+Stderr: progress logs. Stdout or --output: JSON array (default at most 10 * days).
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -27,7 +28,8 @@ _SHARED_DIR = Path(__file__).resolve().parent.parent / "_shared"
 if str(_SHARED_DIR) not in sys.path:
     sys.path.insert(0, str(_SHARED_DIR))
 
-from user_config import daily_papers_config, daily_papers_dir
+from user_config import daily_papers_config, daily_papers_dir, temp_file_path
+from jev_ranker import RankingError, rank_papers
 
 # ── Configuration ──────────────────────────────────────────────────────────
 
@@ -51,13 +53,20 @@ ATOM_NS = {
 # ── Scoring ────────────────────────────────────────────────────────────────
 
 
+def keyword_matches(keyword: str, text: str) -> bool:
+    keyword = keyword.casefold()
+    if keyword.isascii() and keyword.isalnum():
+        return re.search(r"\b" + re.escape(keyword) + r"\b", text) is not None
+    return keyword in text
+
+
 def score_paper(paper: dict, is_trending: bool = False) -> int:
     text = (paper["title"] + " " + paper["abstract"]).lower()
     title_lower = paper["title"].lower()
 
     # 1. Negative keywords → instant reject
     for neg in NEGATIVE_KEYWORDS:
-        if neg in text:
+        if keyword_matches(neg, text):
             return -999
 
     score = 0
@@ -65,15 +74,15 @@ def score_paper(paper: dict, is_trending: bool = False) -> int:
     # 2. Positive keywords
     keyword_hits = 0
     for kw in KEYWORDS:
-        if kw in title_lower:
+        if keyword_matches(kw, title_lower):
             score += 3
             keyword_hits += 1
-        elif kw in text:
+        elif keyword_matches(kw, text):
             score += 1
             keyword_hits += 1
 
     # 3. Domain boost
-    domain_hits = sum(1 for kw in DOMAIN_BOOST_KEYWORDS if kw in text)
+    domain_hits = sum(1 for kw in DOMAIN_BOOST_KEYWORDS if keyword_matches(kw, text))
     if domain_hits >= 2:
         score += 2
     elif domain_hits == 1:
@@ -415,7 +424,8 @@ def merge_and_dedup(
     candidates.sort(key=lambda x: x["score"], reverse=True)
 
     # Back-fill from history if pool is thin
-    if len(candidates) < 20 and removed > 0:
+    backfill_target = min(20, top_n)
+    if len(candidates) < backfill_target and removed > 0:
         backfill = []
         for aid, p in by_id.items():
             if aid not in deduped and p["score"] >= MIN_SCORE:
@@ -423,7 +433,7 @@ def merge_and_dedup(
                 p["last_recommend_date"] = history_ids.get(aid, "unknown")
                 backfill.append(p)
         backfill.sort(key=lambda x: x["score"], reverse=True)
-        needed = 20 - len(candidates)
+        needed = backfill_target - len(candidates)
         candidates.extend(backfill[:needed])
         if backfill[:needed]:
             print(f"  Back-filled {min(needed, len(backfill))} from history", file=sys.stderr)
@@ -440,6 +450,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", help="Target date YYYY-MM-DD (default: today)")
     parser.add_argument("--days", type=int, default=1, help="Number of days to fetch (default: 1)")
+    parser.add_argument("--output", type=Path, help="Write UTF-8 JSON directly, avoiding shell redirection encoding")
+    parser.add_argument("--ranker", choices=("jev", "keyword"), help="Override the configured ranking backend")
+    parser.add_argument("--candidates-output", type=Path, help="Save the pre-Jev shortlist for reproducible comparison")
+    parser.add_argument("--usage-output", type=Path, help="Save ranking calls, scores and actual API token usage")
     args = parser.parse_args()
 
     target_date = (
@@ -449,7 +463,17 @@ def main():
     )
     days = max(1, args.days)
     start_date = target_date - timedelta(days=days - 1)
+    if type(TOP_N) is not int or TOP_N < 1:
+        parser.error("daily_papers.top_n must be a positive integer")
     top_n = TOP_N * days
+    backend = args.ranker or _CONFIG["ranking"]["backend"]
+    if backend not in ("jev", "keyword"):
+        parser.error("daily_papers.ranking.backend must be jev or keyword")
+    pool_size = _CONFIG["candidate_pool_size"]
+    if type(pool_size) is not int or pool_size < TOP_N:
+        parser.error("candidate_pool_size must be an integer greater than or equal to top_n")
+    if backend == "jev" and not os.environ.get("TYPESAFE_API_KEY", "").strip():
+        parser.error("Set TYPESAFE_API_KEY for Jev, or explicitly use --ranker keyword")
 
     is_weekend = target_date.weekday() >= 5
     print(
@@ -460,13 +484,34 @@ def main():
 
     hf_papers = fetch_hf_papers(start_date, target_date)
     arxiv_papers = fetch_arxiv_papers(start_date, target_date, days)
-    top = merge_and_dedup(hf_papers, arxiv_papers, target_date, days=days, top_n=top_n)
+    candidates = merge_and_dedup(
+        hf_papers, arxiv_papers, target_date, days=days, top_n=pool_size * days,
+    )
+    if args.candidates_output:
+        args.candidates_output.write_text(json.dumps(candidates, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    usage_path = args.usage_output or temp_file_path("daily_papers_ranking.json")
+    if backend == "jev":
+        try:
+            top, report = rank_papers(candidates, _CONFIG, top_n)
+        except RankingError as error:
+            usage_path.write_text(json.dumps(error.report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            parser.exit(1, f"Jev ranking failed: {error}. Partial report: {usage_path}\n")
+    else:
+        top = candidates[:top_n]
+        report = {"backend": "keyword", "status": "complete", "candidate_count": len(candidates),
+                  "selected_count": len(top), "usage": {"input_tokens": 0, "output_tokens": 0}}
+    report["date"] = target_date.isoformat()
+    report["days"] = days
+    usage_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"  Selected {len(top)}/{top_n} papers with {backend}; usage: {usage_path}", file=sys.stderr)
 
-    # Output to stdout (UTF-8 encoded for Windows compatibility)
-    import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    json.dump(top, sys.stdout, ensure_ascii=False, indent=2)
-    print(file=sys.stdout)  # trailing newline
+    output = json.dumps(top, ensure_ascii=False, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(output, encoding="utf-8")
+    else:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        sys.stdout.write(output)
 
 
 if __name__ == "__main__":

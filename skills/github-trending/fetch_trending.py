@@ -128,6 +128,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--since", default="weekly", choices=["daily", "weekly", "monthly"])
     ap.add_argument("--language", default="", help="按语言过滤，如 python / rust；留空为全部")
+    ap.add_argument("--output", type=Path, help="直接写 UTF-8 JSON 文件，避免 shell 重定向编码差异")
     args = ap.parse_args()
 
     url = f"https://github.com/trending?since={args.since}"
@@ -150,8 +151,13 @@ def main() -> int:
     relevant_n = sum(1 for r in repos if r["relevant"])
     log(f"   其中与研究方向相关: {relevant_n} 个")
 
-    json.dump(repos, sys.stdout, ensure_ascii=False, indent=2)
-    sys.stdout.write("\n")
+    output = json.dumps(repos, ensure_ascii=False, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(output, encoding="utf-8")
+    else:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        sys.stdout.write(output)
     return 0
 
 

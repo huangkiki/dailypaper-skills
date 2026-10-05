@@ -28,10 +28,12 @@ ar5iv 的 asset 编号（x1.png, x2.png...）**不一定对应论文的 Figure �
 - 适合获取 arXiv HTML 中缺失的方法概览图
 
 ### 来源 C: PDF 提取（最终 fallback）
+
+`TEMP_DIR` 使用运行约定中解析出的临时目录；替换占位符后执行，Windows 使用当前 shell 的目录创建命令。
 ```bash
-wget -O /tmp/paper.pdf "https://arxiv.org/pdf/{arxiv_id}.pdf"
-mkdir -p {笔记所在目录}/assets/
-pdfimages -png /tmp/paper.pdf {笔记所在目录}/assets/{方法名}_fig
+curl -L -o "{TEMP_DIR}/paper.pdf" "https://arxiv.org/pdf/{arxiv_id}.pdf"
+mkdir -p "{笔记所在目录}/assets/"
+pdfimages -png "{TEMP_DIR}/paper.pdf" "{笔记所在目录}/assets/{方法名}_fig"
 ```
 提取后验证：文件 >10KB、Read 确认内容正确。
 

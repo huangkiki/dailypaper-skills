@@ -5,13 +5,17 @@ description: |
   当用户说“更新索引”“更新论文和概念目录”“刷新论文和概念目录”“刷新MOC”时使用。
 ---
 
+## 执行环境
+
+开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。
+
 # 更新目录页
 
 这个 skill 用于手动补刷 Obsidian 里的目录页 / 导航页（MOC）。
 
 ## Step 0: 读取共享配置
 
-先读取 `../_shared/user-config.json`，如果 `../_shared/user-config.local.json` 存在，再用它覆盖默认值。
+运行 `python3 ../_shared/user_config.py`，使用其输出的合并配置（含个人配置和环境变量覆盖）。
 
 显式生成并在后续统一使用这些变量：
 
