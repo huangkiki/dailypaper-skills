@@ -1,0 +1,18 @@
+# Personal Zotero collection mapping (AI auto-generated)
+skills/paper-reader/assets/collection_mapping.json
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Personal configuration belongs outside version control
+skills/_shared/user-config.local.json
+.venv/

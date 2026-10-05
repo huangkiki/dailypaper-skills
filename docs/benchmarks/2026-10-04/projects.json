@@ -1,0 +1,797 @@
+{
+  "status": "complete",
+  "start_date": "2026-09-28",
+  "end_date": "2026-10-04",
+  "searches": [
+    {
+      "query": "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 53,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 30,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 43,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"differentiable simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 1,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 174,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 152,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 91,
+      "incomplete_results": false
+    },
+    {
+      "query": "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false",
+      "status": "complete",
+      "total_count": 7,
+      "incomplete_results": false
+    }
+  ],
+  "new_projects": [
+    {
+      "repo": "Abhishek1033ubuntu/hypersonic-aerothermal-boundary-suite",
+      "url": "https://github.com/Abhishek1033ubuntu/hypersonic-aerothermal-boundary-suite",
+      "description": "A comprehensive multi-physics simulation suite designed to resolve Shockwave Boundary-Layer Interaction (SWBLI) and aerothermal transition on hypersonic projectiles (Mach > 5).",
+      "stars": 2,
+      "created_at": "2026-09-28T18:18:44Z",
+      "pushed_at": "2026-09-29T08:02:05Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "AGENTSUBHRA007/IRIS_SIH2026_MVP",
+      "url": "https://github.com/AGENTSUBHRA007/IRIS_SIH2026_MVP",
+      "description": "IRIS — Edge-AI Conveyor Condition Monitoring, Digital Twin & Predictive Maintenance platform featuring real-time YOLO defect inspection, temporal tracking, and physics simulation for bulk-material handling. (SIH 2026 | Team EcoNova | PS: SIH26008)",
+      "stars": 1,
+      "created_at": "2026-09-28T16:06:22Z",
+      "pushed_at": "2026-10-02T05:48:46Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Abhishek1033ubuntu/hermetic-vacuum-tribology-drive",
+      "url": "https://github.com/Abhishek1033ubuntu/hermetic-vacuum-tribology-drive",
+      "description": "Multi-physics simulation and engineering validation for zero-leakage hermetic magnetic drives, non-conductive $Si_3N_4$ barriers, and binary He-Xe gas loops in ultra-high vacuum (UHV).",
+      "stars": 1,
+      "created_at": "2026-09-28T08:54:41Z",
+      "pushed_at": "2026-09-28T16:33:33Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "BrettWhitson/prismatrix",
+      "url": "https://github.com/BrettWhitson/prismatrix",
+      "description": "Lightning fast and lightweight Graph Rendering and Physics Engine",
+      "stars": 1,
+      "created_at": "2026-09-30T21:59:55Z",
+      "pushed_at": "2026-09-30T22:00:35Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Franky5278/Embodied-AI-Vision-Language-Action-World-Models-",
+      "url": "https://github.com/Franky5278/Embodied-AI-Vision-Language-Action-World-Models-",
+      "description": "Reproduction and evaluation of SmolVLA, VLA-JEPA, OpenVLA, π0.5 and TD-MPC2 in robotic simulation.",
+      "stars": 1,
+      "created_at": "2026-09-29T15:20:00Z",
+      "pushed_at": "2026-09-29T15:20:16Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Pavitra-dev24/Gravity-Slingshot",
+      "url": "https://github.com/Pavitra-dev24/Gravity-Slingshot",
+      "description": "Gravity Slingshot is a daily gravity-assist puzzle game with procedurally generated levels and a server-verified leaderboard. The server replays each shot with a shared deterministic physics simulation to block cheating. Built with vanilla JS/Canvas and a Node/Express REST API, deployed on Vercel and Render.",
+      "stars": 1,
+      "created_at": "2026-10-02T07:08:38Z",
+      "pushed_at": "2026-10-02T07:19:25Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "mrrizwanishaq9/RoboPilot_V50.py",
+      "url": "https://github.com/mrrizwanishaq9/RoboPilot_V50.py",
+      "description": "RoboPilot V50 is a Python robotics simulation lab featuring a 2D robot, A* path planning, autonomous navigation, virtual sensors, obstacle detection, battery monitoring, collision tracking, manual controls, live telemetry, random maps, JSON save/load, and an interactive Tkinter GUI. Ideal for learning robotics, AI navigation, and automation.",
+      "stars": 1,
+      "created_at": "2026-09-29T12:23:07Z",
+      "pushed_at": "2026-09-29T12:25:17Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "neelrsandilya/bouncy-extension",
+      "url": "https://github.com/neelrsandilya/bouncy-extension",
+      "description": "Boing Web- Inject a lightweight, high-performance physics engine into your browser, transforming static web pages into bouncy, interactive playgrounds",
+      "stars": 1,
+      "created_at": "2026-10-03T10:24:47Z",
+      "pushed_at": "2026-10-03T11:04:55Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "saltymother/physics-wonderland",
+      "url": "https://github.com/saltymother/physics-wonderland",
+      "description": "Physics Wonderland 3D interactive physics simulation for students",
+      "stars": 1,
+      "created_at": "2026-10-03T13:42:49Z",
+      "pushed_at": "2026-10-04T07:13:04Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "voyger4869/cubli-sim",
+      "url": "https://github.com/voyger4869/cubli-sim",
+      "description": "A physics simulation of a Cubli (a reaction-wheel cube) in MATLAB/Simulink + Simscape Multibody — balances on an edge and a corner, and stands itself up from flat, on real contact.",
+      "stars": 1,
+      "created_at": "2026-10-01T16:55:50Z",
+      "pushed_at": "2026-10-04T01:50:20Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Ayka11/cymatic-physics-engine",
+      "url": "https://github.com/Ayka11/cymatic-physics-engine",
+      "description": "CPE E2 v7.15 — Experimental Research Platform",
+      "stars": 0,
+      "created_at": "2026-10-02T11:57:32Z",
+      "pushed_at": "2026-10-04T11:00:41Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Bnenne/BipedRobotSimulation",
+      "url": "https://github.com/Bnenne/BipedRobotSimulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-30T19:03:07Z",
+      "pushed_at": "2026-10-01T21:15:08Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "CirkelsZijnTof/physics-engine",
+      "url": "https://github.com/CirkelsZijnTof/physics-engine",
+      "description": "A physics engine in c++. ",
+      "stars": 0,
+      "created_at": "2026-10-02T10:59:17Z",
+      "pushed_at": "2026-10-02T20:30:33Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "CloverAyush/Robot-Simulation",
+      "url": "https://github.com/CloverAyush/Robot-Simulation",
+      "description": "My first time using ROS2",
+      "stars": 0,
+      "created_at": "2026-10-02T12:00:51Z",
+      "pushed_at": "2026-10-02T12:06:22Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "HenryCastledine/Physics-engineering-projects",
+      "url": "https://github.com/HenryCastledine/Physics-engineering-projects",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-29T13:24:41Z",
+      "pushed_at": "2026-10-01T17:37:05Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Immaculate96-dev/robot-simulation-game",
+      "url": "https://github.com/Immaculate96-dev/robot-simulation-game",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-10-01T06:37:00Z",
+      "pushed_at": "2026-10-01T09:33:20Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Lvesucces/college-physics-simulation",
+      "url": "https://github.com/Lvesucces/college-physics-simulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-28T06:50:11Z",
+      "pushed_at": "2026-09-28T06:51:06Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Nawneet-tech/physics-simulation",
+      "url": "https://github.com/Nawneet-tech/physics-simulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-10-02T12:14:28Z",
+      "pushed_at": "2026-10-02T12:16:10Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "SANTHOSH-YADAV-M/Healthcare_Robot_Simulation",
+      "url": "https://github.com/SANTHOSH-YADAV-M/Healthcare_Robot_Simulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-29T17:13:54Z",
+      "pushed_at": "2026-09-29T17:28:05Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Salmiselim/Physics_Engine",
+      "url": "https://github.com/Salmiselim/Physics_Engine",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-28T18:48:59Z",
+      "pushed_at": "2026-09-28T19:12:52Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Simba7643/robot-simulation",
+      "url": "https://github.com/Simba7643/robot-simulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-09-29T09:10:45Z",
+      "pushed_at": "2026-09-29T09:39:02Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Steven-Ou/Robotics-Simulation",
+      "url": "https://github.com/Steven-Ou/Robotics-Simulation",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-10-01T04:28:24Z",
+      "pushed_at": "2026-10-01T04:29:14Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "baeminseongp/Robotics_Simulation_8",
+      "url": "https://github.com/baeminseongp/Robotics_Simulation_8",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-10-02T06:18:41Z",
+      "pushed_at": "2026-10-02T07:58:46Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "cola3999/Robot-Simulation",
+      "url": "https://github.com/cola3999/Robot-Simulation",
+      "description": "Simulating LiDAR in EasyX to achieve simple robot obstacle avoidance",
+      "stars": 0,
+      "created_at": "2026-09-28T12:41:31Z",
+      "pushed_at": "2026-09-28T12:47:56Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "czerongit/physics-engineering",
+      "url": "https://github.com/czerongit/physics-engineering",
+      "description": "we come in peace",
+      "stars": 0,
+      "created_at": "2026-10-04T05:07:00Z",
+      "pushed_at": "2026-10-04T05:07:01Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "hyeonsuhk/pivot",
+      "url": "https://github.com/hyeonsuhk/pivot",
+      "description": "Pivot physics engine",
+      "stars": 0,
+      "created_at": "2026-10-01T01:10:10Z",
+      "pushed_at": "2026-10-01T02:01:06Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "lee101/mojo-warp-lang",
+      "url": "https://github.com/lee101/mojo-warp-lang",
+      "description": "Mojo port of warp-lang - differentiable simulation kernels",
+      "stars": 0,
+      "created_at": "2026-10-03T10:49:12Z",
+      "pushed_at": "2026-10-03T10:49:17Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false",
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "mjsantamarina/physics-simulations",
+      "url": "https://github.com/mjsantamarina/physics-simulations",
+      "description": "Physics simulations: molecular dynamics, integrators, N-body, granular flow",
+      "stars": 0,
+      "created_at": "2026-09-29T17:34:02Z",
+      "pushed_at": "2026-09-29T17:36:23Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "p0l8u1t7o/SimplePhysicsEngine",
+      "url": "https://github.com/p0l8u1t7o/SimplePhysicsEngine",
+      "description": "",
+      "stars": 0,
+      "created_at": "2026-10-03T15:49:00Z",
+      "pushed_at": "2026-10-04T10:06:01Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "ronavkiran/Pengine",
+      "url": "https://github.com/ronavkiran/Pengine",
+      "description": "Physics Engine",
+      "stars": 0,
+      "created_at": "2026-10-01T16:18:12Z",
+      "pushed_at": "2026-10-01T16:19:14Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "turchik-gd/physics-simulations",
+      "url": "https://github.com/turchik-gd/physics-simulations",
+      "description": "Интерактивные симуляции по физике: колебания и влажность",
+      "stars": 0,
+      "created_at": "2026-10-01T19:02:27Z",
+      "pushed_at": "2026-10-01T19:02:55Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description created:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    }
+  ],
+  "recently_updated": [
+    {
+      "repo": "liabru/matter-js",
+      "url": "https://github.com/liabru/matter-js",
+      "description": "a 2D rigid body physics engine for the web ▲● ■",
+      "stars": 18440,
+      "created_at": "2014-02-19T14:16:17Z",
+      "pushed_at": "2026-09-30T17:14:46Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "erincatto/box2d",
+      "url": "https://github.com/erincatto/box2d",
+      "description": "Box2D is a 2D physics engine for games",
+      "stars": 10396,
+      "created_at": "2015-03-14T16:52:46Z",
+      "pushed_at": "2026-10-04T06:14:29Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "erincatto/box3d",
+      "url": "https://github.com/erincatto/box3d",
+      "description": "Box3D is a 3D physics engine for games",
+      "stars": 6517,
+      "created_at": "2026-05-10T20:26:19Z",
+      "pushed_at": "2026-10-04T05:12:40Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "newton-physics/newton",
+      "url": "https://github.com/newton-physics/newton",
+      "description": "An open-source, GPU-accelerated physics simulation engine built upon NVIDIA Warp, specifically targeting roboticists and simulation researchers.",
+      "stars": 5717,
+      "created_at": "2025-04-22T04:12:07Z",
+      "pushed_at": "2026-10-04T03:33:58Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "google-deepmind/mujoco_menagerie",
+      "url": "https://github.com/google-deepmind/mujoco_menagerie",
+      "description": "A collection of high-quality models for the MuJoCo physics engine, curated by Google DeepMind.",
+      "stars": 4148,
+      "created_at": "2022-09-05T10:37:53Z",
+      "pushed_at": "2026-09-29T19:08:07Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "NVIDIA/skills",
+      "url": "https://github.com/NVIDIA/skills",
+      "description": "Agent Skills for NVIDIA products — install into Claude Code, Codex, and other coding agents to run Physical AI, robotics, simulation, CUDA, and RAG workflows end to end.",
+      "stars": 3519,
+      "created_at": "2026-02-25T21:54:05Z",
+      "pushed_at": "2026-10-02T22:28:42Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "google/brax",
+      "url": "https://github.com/google/brax",
+      "description": "Massively parallel rigidbody physics simulation on accelerator hardware.",
+      "stars": 3245,
+      "created_at": "2021-06-02T21:45:19Z",
+      "pushed_at": "2026-09-29T09:16:55Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "PanosK92/SpartanEngine",
+      "url": "https://github.com/PanosK92/SpartanEngine",
+      "description": "A game engine with a fully bindless, GPU-driven renderer featuring real-time path-traced global illumination, hardware ray tracing, and a physics simulation running at 200Hz, built over 12+ years of R&D",
+      "stars": 3179,
+      "created_at": "2016-06-18T03:27:49Z",
+      "pushed_at": "2026-10-01T17:30:04Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "sofa-framework/sofa",
+      "url": "https://github.com/sofa-framework/sofa",
+      "description": "Real-time multi-physics simulation with an emphasis on medical simulation.",
+      "stars": 1266,
+      "created_at": "2016-05-31T12:57:59Z",
+      "pushed_at": "2026-10-02T14:25:18Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "MyoHub/myosuite",
+      "url": "https://github.com/MyoHub/myosuite",
+      "description": "MyoSuite is a collection of environments/tasks to be solved by musculoskeletal models simulated with the MuJoCo physics engine and wrapped in the OpenAI gym API. ",
+      "stars": 1233,
+      "created_at": "2021-11-17T14:34:44Z",
+      "pushed_at": "2026-10-03T21:42:56Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "appsinacup/godot-rapier-physics",
+      "url": "https://github.com/appsinacup/godot-rapier-physics",
+      "description": "Godot Rapier Physics – 2D and 3D physics engine for the Godot game engine. with better stability, performance, liquids, determinism, state serialization and no ghost collisions.",
+      "stars": 1016,
+      "created_at": "2023-10-26T08:39:19Z",
+      "pushed_at": "2026-10-02T13:02:57Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "facebookresearch/project_superdex",
+      "url": "https://github.com/facebookresearch/project_superdex",
+      "description": "SuperDex brings together a purpose-built physics engine, robotics authoring tools, and a scalable reinforcement learning interface in a unified simulation platform, with VR-based teleoperation and additional capabilities planned for future releases.",
+      "stars": 713,
+      "created_at": "2026-08-20T02:04:05Z",
+      "pushed_at": "2026-10-03T20:59:07Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "allenai/vla-evaluation-harness",
+      "url": "https://github.com/allenai/vla-evaluation-harness",
+      "description": "One framework to evaluate any VLA model on any robot simulation benchmark.",
+      "stars": 634,
+      "created_at": "2026-03-13T22:54:40Z",
+      "pushed_at": "2026-10-01T06:08:48Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "isaac-sim/IsaacLab-Arena",
+      "url": "https://github.com/isaac-sim/IsaacLab-Arena",
+      "description": "Isaac Lab - Arena is a robotics simulation framework that enhances NVIDIA Isaac Lab by providing a composable, scalable system for creating diverse simulation environments and evaluating robot learning policies. The framework enables developers to rapidly prototype and test robotic tasks with various robot embodiments, objects, and environments.",
+      "stars": 594,
+      "created_at": "2025-08-15T12:28:23Z",
+      "pushed_at": "2026-10-03T16:11:09Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Gonkee/Gepe3D",
+      "url": "https://github.com/Gonkee/Gepe3D",
+      "description": "Gonkee's Epic Physics Engine 3D (Gepe3D)",
+      "stars": 507,
+      "created_at": "2021-09-29T00:50:26Z",
+      "pushed_at": "2026-09-29T13:01:24Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "notgiven688/jitterphysics2",
+      "url": "https://github.com/notgiven688/jitterphysics2",
+      "description": "Fast, simple, and dependency-free physics engine written in C# with a clear and user-friendly API.",
+      "stars": 450,
+      "created_at": "2023-09-12T16:08:48Z",
+      "pushed_at": "2026-10-04T10:21:36Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "andrealani/COOLFluiD",
+      "url": "https://github.com/andrealani/COOLFluiD",
+      "description": "The object-oriented HPC platform for CFD, plasma and multi-physics simulations whose development started in 2002 at the Von Karman Institute for Fluid Dynamics is finally open!",
+      "stars": 267,
+      "created_at": "2014-09-23T13:00:54Z",
+      "pushed_at": "2026-10-02T11:41:35Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "runmat-org/runmat",
+      "url": "https://github.com/runmat-org/runmat",
+      "description": "Open source math and physics engine that executes MATLAB-syntax code. Features a modern compiler, automatic GPU acceleration for large calculations, and support for math on geometry / FEA calculations.",
+      "stars": 262,
+      "created_at": "2025-07-28T01:44:13Z",
+      "pushed_at": "2026-10-01T01:00:48Z",
+      "matched_queries": [
+        "\"physics engine\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Genesis-Embodied-AI/quadrants",
+      "url": "https://github.com/Genesis-Embodied-AI/quadrants",
+      "description": "High-performance multi-platform compiler for physics simulation",
+      "stars": 219,
+      "created_at": "2025-06-01T01:27:04Z",
+      "pushed_at": "2026-10-02T22:45:09Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "kimimgo/awesome-ai-cae",
+      "url": "https://github.com/kimimgo/awesome-ai-cae",
+      "description": "A curated list of 100+ AI-ready tools for Computer-Aided Engineering, ranked by an AI-Readiness Score (agent-callability: MCP, Python API, CLI, pip). CFD, FEA, SPH, DEM, differentiable simulation, neural operators, PINNs, MCP servers.",
+      "stars": 56,
+      "created_at": "2026-03-13T14:04:43Z",
+      "pushed_at": "2026-09-28T14:44:00Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Dicklesworthstone/frankensim",
+      "url": "https://github.com/Dicklesworthstone/frankensim",
+      "description": "Plan-first Rust continuum for certified geometry, physics simulation, optimization, and rendering.",
+      "stars": 53,
+      "created_at": "2026-07-06T01:53:04Z",
+      "pushed_at": "2026-10-02T18:16:26Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "SimonVutov/SimpleCar2",
+      "url": "https://github.com/SimonVutov/SimpleCar2",
+      "description": "Unity vehicle-physics simulation with custom suspension, tire traction, drivetrain dynamics. This (simpleCar2, 2025) is the sequal to simpleCar (2022).",
+      "stars": 46,
+      "created_at": "2025-01-31T16:24:50Z",
+      "pushed_at": "2026-10-03T12:22:28Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "BattMoTeam/BattMo.jl",
+      "url": "https://github.com/BattMoTeam/BattMo.jl",
+      "description": "Differentiable simulation of batteries in Julia using Jutul.jl",
+      "stars": 39,
+      "created_at": "2022-04-05T11:00:21Z",
+      "pushed_at": "2026-10-04T08:43:16Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "bullet-physics-playground/bpp",
+      "url": "https://github.com/bullet-physics-playground/bpp",
+      "description": "Physics simulation experiments",
+      "stars": 38,
+      "created_at": "2015-10-05T18:22:15Z",
+      "pushed_at": "2026-10-01T20:25:07Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "gazebosim/gz-msgs",
+      "url": "https://github.com/gazebosim/gz-msgs",
+      "description": "Messages for Gazebo robot simulation.",
+      "stars": 35,
+      "created_at": "2020-04-15T09:18:01Z",
+      "pushed_at": "2026-10-02T13:19:19Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "PLAID-lib/plaid",
+      "url": "https://github.com/PLAID-lib/plaid",
+      "description": "PLAID (Physics-Learning AI Datamodel), a flexible and extensible framework for representing and sharing datasets of physics simulations",
+      "stars": 30,
+      "created_at": "2025-05-20T19:01:36Z",
+      "pushed_at": "2026-10-01T19:10:03Z",
+      "matched_queries": [
+        "\"physics simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "hyoseokp/TorchFDTD",
+      "url": "https://github.com/hyoseokp/TorchFDTD",
+      "description": "GPU FDTD for photonics: browser CAD workbench, Python project API and Torch-differentiable simulations on CUDA",
+      "stars": 15,
+      "created_at": "2026-09-19T14:58:53Z",
+      "pushed_at": "2026-10-02T06:24:19Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "choreonoid/choreonoid_ros2_mobile_robot_tutorial",
+      "url": "https://github.com/choreonoid/choreonoid_ros2_mobile_robot_tutorial",
+      "description": "Tutorial on Choreonoid and ROS2 in a mobile robot simulation",
+      "stars": 12,
+      "created_at": "2024-05-14T06:06:40Z",
+      "pushed_at": "2026-09-29T15:17:12Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "4rtur1t0/pyARTE",
+      "url": "https://github.com/4rtur1t0/pyARTE",
+      "description": "Robot simulations using Coppelia",
+      "stars": 10,
+      "created_at": "2021-11-24T16:29:02Z",
+      "pushed_at": "2026-09-28T17:27:25Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "gfloresc/RoboticsToolbox-Python-Lessons",
+      "url": "https://github.com/gfloresc/RoboticsToolbox-Python-Lessons",
+      "description": "This repository provides Python scripts, lecture materials, and lab exercises for the Robotics and Automation course. It serves as a learning resource for students and researchers exploring robot kinematics, trajectory planning, control strategies, and robotic simulations using Python.",
+      "stars": 9,
+      "created_at": "2025-02-09T03:14:16Z",
+      "pushed_at": "2026-09-30T17:57:49Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "DFKI-NI/mobipick_labs",
+      "url": "https://github.com/DFKI-NI/mobipick_labs",
+      "description": "MobiPick Labs is a physics based robot simulation environment with a high level Python API and real time semantic facts for planning and acting research.",
+      "stars": 7,
+      "created_at": "2022-11-18T15:00:57Z",
+      "pushed_at": "2026-10-01T05:54:20Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "angysof16/BaxterMotionPlanning",
+      "url": "https://github.com/angysof16/BaxterMotionPlanning",
+      "description": "Baxter robot simulation in ROS2 Jazzy + Gazebo Harmonic, with a roadmap toward distributed motion planning via a custom ROS2 Action interface and Zenoh as RMW bridge.",
+      "stars": 6,
+      "created_at": "2026-03-28T17:16:48Z",
+      "pushed_at": "2026-10-03T17:02:14Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "YH563/RobotSimulation",
+      "url": "https://github.com/YH563/RobotSimulation",
+      "description": "ROS-free, embeddable robot 3D visualization & simulation library for .NET 8 — rviz-like, UI-framework agnostic.",
+      "stars": 4,
+      "created_at": "2026-08-30T09:33:24Z",
+      "pushed_at": "2026-10-02T09:17:45Z",
+      "matched_queries": [
+        "\"robot simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "Ash12H/SeapoPym-JAX",
+      "url": "https://github.com/Ash12H/SeapoPym-JAX",
+      "description": "JAX-accelerated framework for differentiable simulation of dynamical systems on GPU. DAG-based architecture with gradient and evolutionary optimization (CMA-ES, Optax).",
+      "stars": 0,
+      "created_at": "2025-11-14T16:55:37Z",
+      "pushed_at": "2026-10-01T08:05:57Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "bundledcontactgradients/bundledcontactgradients.github.io",
+      "url": "https://github.com/bundledcontactgradients/bundledcontactgradients.github.io",
+      "description": "Project page for Bundled Contact Gradients: Stabilizing Differentiable Simulation for Deployable Dynamic Tasks",
+      "stars": 0,
+      "created_at": "2026-09-23T17:56:10Z",
+      "pushed_at": "2026-09-28T04:25:40Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    },
+    {
+      "repo": "edavidk7/diff_repressilator",
+      "url": "https://github.com/edavidk7/diff_repressilator",
+      "description": "A differentiable simulation is all you need for repressilator identification from sparse reporters. I compare a number of state-of-the-art estimation methods (sequential monte carlo, constrained gaussian process, physics-informed neural network)  and find that having simply the differentiable simulation is sufficient.",
+      "stars": 0,
+      "created_at": "2026-09-08T18:20:24Z",
+      "pushed_at": "2026-10-01T09:17:23Z",
+      "matched_queries": [
+        "\"differentiable simulation\" in:name,description pushed:2026-09-28..2026-10-04 fork:false archived:false"
+      ]
+    }
+  ]
+}

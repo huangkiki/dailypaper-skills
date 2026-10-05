@@ -1,0 +1,46 @@
+{
+  "pricing_checked_at": "2026-10-05",
+  "scope": "semantic_scoring_only",
+  "candidate_count": 30,
+  "selected_per_arm": 10,
+  "baseline_model": "gpt-6-astra",
+  "baseline_usage": {
+    "prompt_tokens": 11665,
+    "completion_tokens": 267,
+    "total_tokens": 11932,
+    "prompt_tokens_details": {
+      "cached_tokens": 2304
+    }
+  },
+  "jev_model": "jev-1.13.0",
+  "jev_usage": {
+    "input_tokens": 13724,
+    "output_tokens": 474
+  },
+  "rates_usd_per_million": {
+    "baseline_input": 10,
+    "baseline_cached_input": 1,
+    "baseline_output": 50,
+    "jev_input": 0.042,
+    "jev_output": 0
+  },
+  "baseline_uncached_list_price_usd": 0.13,
+  "baseline_all_cached_input_list_price_usd": 0.025015,
+  "jev_list_price_usd": 0.000576408,
+  "uncached_list_price_saving_percent": 99.55660923076923,
+  "all_cached_input_list_price_saving_percent": 97.69575054967021,
+  "latency_seconds": {
+    "baseline": 10.3487,
+    "jev": 0.5187
+  },
+  "latency_speedup": 19.951224214382105,
+  "selection_overlap": 9,
+  "jev_token_reduction_from_first_integration_percent": 25.11603375527426,
+  "billing_caveat": "Official standard API list-price calculation using reported cached tokens, not an invoice. Baseline ran via a ChatGPT-account relay. Subscription marginal cash spend and actual service-tier charges are not inferred.",
+  "sources": [
+    "https://docs.typesafe.ai/models",
+    "https://developers.openai.com/api/docs/models/gpt-6-astra"
+  ],
+  "baseline_observed_cache_list_price_usd": 0.109264,
+  "observed_cache_list_price_saving_percent": 99.47246302533314
+}

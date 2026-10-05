@@ -1,0 +1,38 @@
+[
+  {
+    "file": "scoring-benchmark.json",
+    "sha256": "eb5da7fb72a6c10d4a2a62c963d607371d772b18ff4b00b582bbb507cd6248c9",
+    "status": "incomplete",
+    "error": "Baseline API returned HTTP 400",
+    "diagnosis": "HTTP 400; old model unsupported",
+    "reported_baseline_usage": null,
+    "requested_model": "gpt-5.4"
+  },
+  {
+    "file": "scoring-benchmark-retry.json",
+    "sha256": "7ec5ae24c6643b2bd1e13ed09e30b05dfa605c812459029acf89f878f957b07f",
+    "status": "incomplete",
+    "error": "Baseline API returned HTTP 400",
+    "diagnosis": "HTTP 400; old model unsupported",
+    "reported_baseline_usage": null,
+    "requested_model": "gpt-5.4"
+  },
+  {
+    "file": "scoring-benchmark-diagnostic.json",
+    "sha256": "8d3bf77e40d3122f07acc252cac643de8cf5619edffc7eba58fd02f24ca983c8",
+    "status": "incomplete",
+    "error": "Baseline API returned HTTP 400",
+    "diagnosis": "gpt-5.4 is not supported when using Codex with a ChatGPT account",
+    "reported_baseline_usage": null,
+    "requested_model": "gpt-5.4"
+  },
+  {
+    "file": "scoring-benchmark-astra.json",
+    "sha256": "6e4c2c087f2337924f3da287b3623abe7e381853b2fbcdbb3ca2d919fc5945d8",
+    "status": "incomplete",
+    "error": "Baseline API returned HTTP 400",
+    "diagnosis": "Stream must be set to true",
+    "reported_baseline_usage": null,
+    "requested_model": "gpt-6-astra"
+  }
+]

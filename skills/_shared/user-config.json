@@ -1,0 +1,118 @@
+{
+  "paths": {
+    "obsidian_vault": "~/ObsidianVault",
+    "paper_notes_folder": "论文笔记",
+    "daily_papers_folder": "DailyPapers",
+    "github_trending_folder": "GitHubTrending",
+    "concepts_folder": "_概念",
+    "zotero_db": "~/Zotero/zotero.sqlite",
+    "zotero_storage": "~/Zotero/storage"
+  },
+  "daily_papers": {
+    "keywords": [
+      "reinforcement learning",
+      "rlhf",
+      "rlvr",
+      "grpo",
+      "rl infrastructure",
+      "rl infra",
+      "distributed rollout",
+      "policy optimization",
+      "verl",
+      "slime",
+      "areal",
+      "world model",
+      "jepa",
+      "joint embedding predictive",
+      "latent dynamics",
+      "dexterous",
+      "in-hand manipulation",
+      "multi-finger",
+      "robot hand",
+      "hand simulation",
+      "contact-rich",
+      "differentiable simulation",
+      "gpu simulation",
+      "batched simulation",
+      "superdex",
+      "mjlab",
+      "unlib",
+      "unilab",
+      "unisim",
+      "mjbatch",
+      "mujoco",
+      "physics engine",
+      "physics simulator",
+      "robotics simulation",
+      "simulation framework",
+      "simulation engine",
+      "rigid body",
+      "soft body",
+      "deformable simulation",
+      "contact solver",
+      "gpu physics",
+      "parallel simulation",
+      "newton",
+      "isaac sim",
+      "isaacsim",
+      "physx",
+      "genesis"
+    ],
+    "negative_keywords": [
+      "medical imaging",
+      "weather forecast",
+      "climate prediction",
+      "protein folding",
+      "drug discovery",
+      "speech synthesis",
+      "music generation"
+    ],
+    "domain_boost_keywords": [
+      "rollout",
+      "post-training",
+      "reasoning",
+      "contact dynamics",
+      "sim-to-real",
+      "sim2real",
+      "physics simulation",
+      "manipulation",
+      "grasping"
+    ],
+    "arxiv_categories": [
+      "cs.RO",
+      "cs.LG",
+      "cs.AI",
+      "cs.CL",
+      "cs.DC",
+      "cs.CV"
+    ],
+    "min_score": 2,
+    "top_n": 10,
+    "research_interests": [
+      "Reinforcement learning for large language models: RLHF, RLVR, GRPO, policy optimization, reasoning and agent training.",
+      "RL infrastructure: distributed training, rollout generation, inference/training scheduling, scalable RL systems such as verl, slime and AReaL.",
+      "World models, especially the JEPA family: I-JEPA, V-JEPA, V-JEPA 2, joint-embedding predictive architectures and action-conditioned latent prediction.",
+      "Dexterous manipulation tasks: multi-finger hand control, in-hand manipulation, grasping, contact-rich tasks and robot learning.",
+      "Dexterous-hand physics simulation and sim-to-real: contact dynamics, differentiable simulation, GPU parallel environments and batched simulation.",
+      "Physics simulation engines and emerging simulation infrastructure for robotics and embodied AI: rigid/soft-body dynamics, contact solvers, GPU parallel simulation, differentiable simulation and sim-to-real. Examples include MuJoCo, Newton, Isaac Sim, PhysX, Genesis, SuperDex, mjlab, unlib, UniLab and mjbatch. These are examples, not a whitelist: discover relevant new projects and ecosystem advances too."
+    ],
+    "candidate_pool_size": 30,
+    "ranking": {
+      "backend": "jev",
+      "model": "jev-1.13.0",
+      "batch_size": 30,
+      "min_score": 2.0
+    },
+    "project_queries": [
+      "\"physics simulation\" in:name,description",
+      "\"physics engine\" in:name,description",
+      "\"robot simulation\" in:name,description",
+      "\"differentiable simulation\" in:name,description"
+    ]
+  },
+  "automation": {
+    "auto_refresh_indexes": true,
+    "git_commit": false,
+    "git_push": false
+  }
+}
