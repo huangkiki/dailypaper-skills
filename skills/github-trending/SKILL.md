@@ -1,12 +1,21 @@
 ---
 name: github-trending
 description: |
+  Discover trending GitHub repositories and research-related project updates. English triggers: "weekly GitHub trending", "daily GitHub trending", "monthly GitHub trending".
+
   抓取 GitHub 上 star 涨得最快的项目（Trending 榜），打分标注是否与研究方向相关，
   生成 Obsidian 笔记到 GitHubTrending 文件夹。默认周榜。
 
   触发词："GitHub 周榜"、"star 涨得最快"、"过去一周 GitHub 热门"、"GitHub trending"、
   "看看这周 GitHub 上火了什么"、"GitHub 日榜"、"GitHub 月榜"
 ---
+
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
 
 ## 执行环境
 

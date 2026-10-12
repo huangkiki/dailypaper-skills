@@ -1,5 +1,7 @@
 # 在不同 Agent 中运行
 
+先按 [语言规则](language.md) 确定并传递 `OUTPUT_LANGUAGE`；英文运行读取 [English runtime](agent-runtime.en.md)。
+
 这套技能共用一份工作流，所需能力是：读取指令与论文、运行 Python/命令行、联网获取来源、写入 Markdown。使用当前宿主实际提供的工具；不要求某个品牌或模型。
 
 ## 路径与配置

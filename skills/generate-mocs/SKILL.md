@@ -1,9 +1,18 @@
 ---
 name: generate-mocs
 description: |
+  Refresh paper and concept indexes (maps of content). English triggers: "refresh indexes", "update paper and concept indexes", "refresh MOCs".
+
   重新生成 Obsidian 里的目录页 / 导航页（MOC）。
   当用户说“更新索引”“更新论文和概念目录”“刷新论文和概念目录”“刷新MOC”时使用。
 ---
+
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
 
 ## 执行环境
 

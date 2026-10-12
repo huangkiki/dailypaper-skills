@@ -12,7 +12,7 @@
 - **Obsidian 可选**：产物本身是 Markdown；Obsidian 更适合浏览双向链接、概念库和目录页。
 - **Zotero 可选**：仅使用自己的 Zotero 文献库时需要。
 
-核心脚本使用 Python 标准库，无需模型 SDK。语义评分需要 **TypeSafe API key**；点评与精读使用宿主 Agent 的模型。
+核心脚本使用 Python 标准库，无需模型 SDK。默认由当前 Agent 在会话内语义评分、点评与精读，**无需额外 API key**；只有可选的 Jev 模式需要 TypeSafe key。宿主模型仍按现有账户规则消耗额度。
 
 ### 2. 安装到你使用的 Agent
 
@@ -64,7 +64,15 @@ python3 skills/_shared/user_config.py --init
 研究方向是 robot learning、VLA、diffusion policy。请使用跨 Agent 的共享配置。
 ```
 
-在启动 Agent 的环境中设置 `TYPESAFE_API_KEY`（不要写进配置文件或提交到 Git）：
+默认 `daily_papers.ranking.backend="agent"`：脚本召回候选，当前 Agent 阅读标题和摘要，按研究兴趣逐篇评分；校验完整性后选出每天最多 10 篇，继续富化、点评、笔记。无需配置新的模型供应商或 API key。
+
+| `ranking.backend` | 行为 | 额外密钥 |
+| --- | --- | --- |
+| `agent`（默认） | 当前 Agent 语义评分，脚本校验与选取 | 不需要 |
+| `jev` | TypeSafe Jev API 语义评分 | `TYPESAFE_API_KEY` |
+| `keyword` | 直接按关键词分筛选 | 不需要 |
+
+只有选择 `jev` 时，在启动 Agent 的环境中设置 `TYPESAFE_API_KEY`（不要写进配置文件或提交到 Git）：
 
 ```bash
 export TYPESAFE_API_KEY="你的 TypeSafe API key"
@@ -74,11 +82,27 @@ export TYPESAFE_API_KEY="你的 TypeSafe API key"
 $env:TYPESAFE_API_KEY = "你的 TypeSafe API key"
 ```
 
-默认使用固定版本 `jev-1.13.0`，按标题与摘要打语义相关性分，每天最多推荐 10 篇。没有密钥时会明确报错；需要纯关键词模式，可把 `daily_papers.ranking.backend` 改为 `keyword`。升级不会覆盖已有个人配置，因此老用户需手动更新 `top_n`、`research_interests` 和 `ranking`。
+可选 Jev 模式仍使用固定版本 `jev-1.13.0`，失败不自动换模式。环境里已有 key 也不会使默认 Agent 模式自动调用 Jev。
+
+**旧配置迁移**：升级不覆盖个人配置；原来是 `jev` 的用户，将有效个人配置里的 `daily_papers.ranking.backend` 改为 `agent` 即可，不必删除其他评分参数。运行 `user_config.py` 检查合并后的实际配置，避免被 `DAILYPAPER_CONFIG` 等更高优先级配置覆盖。
 
 重新启动 / 刷新 Agent 会话后，输入 `今日论文推荐`。在 Claude Code 中也可显式输入 `/daily-papers`，Codex 中可输入 `$daily-papers`。这些是**对话指令，不是终端命令**。
 
 已有用户：原来的 `_shared/user-config.json` 和 `user-config.local.json` 仍然有效。迁移共享配置时，从原安装目录运行 `user_config.py --init`，可保留原来的个人设置；无需切换到 `codex+humanoid` 分支才能使用 Codex。
+
+## 中英文自动切换
+
+英文提问自动读取各技能的 `SKILL.en.md` 并输出英文，中文提问使用原中文流程；明确指定输出语言时优先遵循指定。语言从用户的请求判断，不从论文标题、URL、代码或工具输出判断，并在抓取、点评、笔记和目录刷新之间传递。
+
+- `Recommend papers from the past three days`：最近三天，英文产物。
+- `今日论文推荐，用英文输出`：当天，英文产物。
+- `Read this paper, but write in Chinese`：中文解析。
+
+英文推荐文件使用 `YYYY-MM-DD-paper-recommendations.md`；中文仍使用 `YYYY-MM-DD-论文推荐.md`。后续阶段传递实际文件路径，回填脚本兼容两种语言。语言切换不重命名已有目录、笔记或概念链接；如需英文目录名，在配置中显式设置。
+
+直接调用生成脚本时，`generate_paper_mocs.py`、`generate_concept_mocs.py` 和 `write_trending_note.py` 支持 `--output-language en`，默认 `zh`。`fetch_trending.py --language python` 仍然是编程语言筛选。Web Viewer 界面和可选 Claude daemon 不在此语言切换范围内。
+
+[English README](../README.en.md) · [完整语言规则](../skills/_shared/language.md)
 
 ## 日常怎么用
 
@@ -105,14 +129,14 @@ $env:TYPESAFE_API_KEY = "你的 TypeSafe API key"
 | `paths.obsidian_vault` | 笔记库根路径 |
 | `paths.paper_notes_folder` / `daily_papers_folder` / `concepts_folder` | 论文、推荐和概念目录名 |
 | `paths.zotero_db` / `zotero_storage` | Zotero 数据库和附件路径；不用 Zotero 时无需配置 |
-| `daily_papers.research_interests` | Jev 使用的完整研究兴趣描述；项目名只是示例 |
+| `daily_papers.research_interests` | 当前 Agent 或 Jev 使用的完整研究兴趣描述；项目名只是示例 |
 | `daily_papers.keywords` | Python 用于候选召回的关键词 |
 | `daily_papers.negative_keywords` | 不想看的主题，注意检查是否误排自己的方向 |
 | `daily_papers.domain_boost_keywords` | 额外加分的领域词 |
 | `daily_papers.arxiv_categories` / `min_score` | arXiv 分类和关键词召回阈值 |
 | `daily_papers.top_n` / `candidate_pool_size` | 每天最多推荐 10 篇；语义评分候选池默认最多 30 篇 |
 | `daily_papers.project_queries` | GitHub 新项目 / 近期更新的主题检索式，不限已知项目名单 |
-| `daily_papers.ranking` | `backend: jev`、固定模型版本、批大小和最低相关性分（0–4） |
+| `daily_papers.ranking` | `backend: agent`（默认，可选 `jev` / `keyword`）；语义最低分 0–4；model / batch_size 仅供 Jev 使用 |
 
 各配置文件按下面的顺序合并，后者覆盖前者；数组整体替换：
 
@@ -163,12 +187,15 @@ $env:DAILYPAPER_CONFIG = "C:/Users/YourName/my-config.json"  # 可选
 ```text
 你说“今日论文推荐”
   → Python：HuggingFace Daily / Trending + arXiv 抓取、关键词召回、去重
-  → Jev：按研究兴趣语义评分，选择最多 10 篇，再由 Python 富化
+  → 当前 Agent：逐篇读候选摘要并给语义分；Python 校验后选择最多 10 篇并富化
+    （可选 Jev API 评分或纯关键词模式）
   → Agent：结合已有笔记和研究方向，写推荐点评与分流表
   → Agent：用 paper-reader 精读“必读”论文，补概念、回填链接、刷新目录
 ```
 
-关键词召回不消耗模型 token；Jev 评分会调用 TypeSafe API，并把实际 `usage`、评分分布和耗时记录到 `daily_papers_ranking.json`。点评、精读和 Agent 编排仍消耗宿主模型额度。Jev 的相关性分与 confidence 不代表论文正确性或科学质量。
+关键词召回不消耗模型 token。默认 Agent 评分、点评和精读消耗现有宿主模型额度，无需额外密钥不等于免费。`agent_ranker.py` 不调用模型 API，只验证本次 `run_id`、全量候选评分、阈值和上限；原始请求、评分理由和入选 URL 写入 `daily_papers_ranking.json`。脚本不知道宿主 token 用量，所以 `usage=null`，不伪报 0。
+
+显式 Jev 模式才调用 TypeSafe API，并记录实际 `usage`、评分分布和耗时。所有语义相关性分都不代表论文质量；Jev confidence 也不是正确概率。历史 Jev 费用对照不代表默认 Agent 模式的费用。
 
 同数量的评分对照方法和结果见 [Jev 评分费用与耗时对照](jev-benchmark.md)。
 

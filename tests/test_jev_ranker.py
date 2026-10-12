@@ -111,11 +111,11 @@ class JevRankingTests(IsolatedWorkspace):
         self.assertEqual(selected, [])
         self.assertTrue(report["usage_complete"])
 
-    def test_fetch_default_actually_uses_jev_and_caps_at_ten(self):
+    def test_fetch_explicit_jev_actually_uses_api_and_caps_at_ten(self):
         fetch = load_module("jev_fetch", ROOT / "skills/daily-papers/fetch_and_score.py")
         output, usage = self.root / "selected.json", self.root / "usage.json"
         candidates = [paper(i) for i in range(30)]
-        with patch.object(sys, "argv", ["fetch", "--output", str(output), "--usage-output", str(usage)]), \
+        with patch.object(sys, "argv", ["fetch", "--ranker", "jev", "--output", str(output), "--usage-output", str(usage)]), \
                 patch.object(fetch, "fetch_hf_papers", return_value=[]), \
                 patch.object(fetch, "fetch_arxiv_papers", return_value=[]), \
                 patch.object(fetch, "merge_and_dedup", return_value=candidates), \

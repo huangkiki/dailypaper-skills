@@ -1,11 +1,20 @@
 ---
 name: daily-papers-review
 description: |
+  Review fetched papers and write evidence-based recommendations with reading priorities. English triggers: "review fetched papers", "generate paper recommendations". This is pipeline stage 2.
+
   论文点评（3 步流水线的第 2 步）。读取富化后的论文数据，扫描笔记库，生成有态度的推荐点评，
   保存推荐文件到 Obsidian，更新 history；git 自动化默认关闭。
 
   触发词："论文点评"、"跑一下论文点评"
 ---
+
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
 
 ## 执行环境
 
@@ -92,7 +101,7 @@ description: |
 
 #### 兜底过滤
 
-只评价抓取阶段已选中并富化的论文，默认每天最多 10 篇。若发现与配置中的任何兴趣均无关，跳过并在末尾注明标题和原因；不为凑数追加候选。不因论文属于 LLM、NLP 或 agent 方向就一概排除。Jev 分数是主题相关性，不是研究质量；confidence 反映分布集中程度，不是正确概率。保留本文基于证据的点评、分流和局限分析。
+只评价抓取阶段已选中并富化的论文，默认每天最多 10 篇。若发现与配置中的任何兴趣均无关，跳过并在末尾注明标题和原因；不为凑数追加候选。不因论文属于 LLM、NLP 或 agent 方向就一概排除。Agent / Jev 的语义分是主题相关性，不是研究质量；只有 Jev 输出的 confidence 反映分布集中程度，也不是正确概率。不要给 Agent 评分编造 Jev 元数据。保留本文基于证据的点评、分流和局限分析。
 
 #### 铁律：基于事实评价
 
@@ -219,6 +228,7 @@ description: |
 date: YYYY-MM-DD
 keywords: [从有效配置 daily_papers.keywords 中填写本次实际相关的关键词]
 tags: [daily-papers, auto-generated]
+language: zh
 ---
 ```
 

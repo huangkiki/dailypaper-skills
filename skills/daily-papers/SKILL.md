@@ -1,11 +1,20 @@
 ---
 name: daily-papers
 description: |
+  Recommend today’s papers or papers from the past N days/week; run discovery, review, and priority-paper notes. English triggers: "recommend papers", "daily papers", "papers from the past week".
+
   每日论文推荐的一句话总入口。用户说“今日论文推荐”“过去3天论文推荐”“过去一周论文推荐”
   “最近3天论文”“看看这周有啥论文”时使用。
 
   内部会自动串联论文抓取、推荐生成、重点论文笔记三步，无需用户手动拆开。
 ---
+
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
 
 ## 执行环境
 

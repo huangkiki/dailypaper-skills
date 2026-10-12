@@ -65,6 +65,12 @@ class InstallerTests(IsolatedWorkspace):
                 destination = self.home / directory
                 self.assertEqual(len(list(destination.glob('*/SKILL.md'))), 7)
                 self.assertTrue((destination / '_shared/agent-runtime.md').is_file())
+                self.assertEqual(len(list(destination.glob('*/SKILL.en.md'))), 7)
+                for relative in ('_shared/language.md', '_shared/agent-runtime.en.md',
+                                 'paper-reader/assets/paper-note-template.en.md',
+                                 'paper-reader/assets/concept-note-template.en.md'):
+                    self.assertEqual((destination / relative).read_bytes(),
+                                     (installer.SOURCE / relative).read_bytes())
                 config = self.run_python(destination / '_shared/user_config.py')
                 self.assertEqual(config.returncode, 0, config.stderr)
                 self.assertEqual(json.loads(config.stdout)['paths']['obsidian_vault'],

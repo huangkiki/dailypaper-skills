@@ -34,7 +34,10 @@ def build_tree_mocs(
     title_prefix: str,
     intro: str,
     exclude_dir_names: Iterable[str] = (),
+    output_language: str = "zh",
 ) -> MOCSummary:
+    if output_language not in {"zh", "en"}:
+        raise ValueError("output_language must be zh or en")
     root_dir.mkdir(parents=True, exist_ok=True)
     summary = MOCSummary(root_dir=root_dir)
     excluded = set(exclude_dir_names)
@@ -53,6 +56,7 @@ def build_tree_mocs(
             title_prefix=title_prefix,
             intro=intro,
             exclude_dir_names=excluded,
+            output_language=output_language,
         )
         moc_path = directory / f"{directory.name}.md"
         if not moc_path.exists():
@@ -118,7 +122,9 @@ def _build_moc_content(
     title_prefix: str,
     intro: str,
     exclude_dir_names: set[str],
+    output_language: str,
 ) -> str:
+    english = output_language == "en"
     relative_dir = directory.relative_to(root_dir)
     display_name = _display_name(root_dir, directory)
 
@@ -133,47 +139,52 @@ def _build_moc_content(
     )
 
     lines = [
-        f"# {title_prefix}：{display_name}",
+        f"# {title_prefix}{': ' if english else '：'}{display_name}",
         "",
         intro,
         "",
     ]
 
     if directory == root_dir:
-        lines.append(f"- 根目录：`{root_dir}`")
+        lines.append(f"- Root directory: `{root_dir}`" if english else f"- 根目录：`{root_dir}`")
     else:
-        lines.append(f"- 当前目录：`{relative_dir.as_posix()}`")
+        lines.append(f"- Current directory: `{relative_dir.as_posix()}`" if english
+                     else f"- 当前目录：`{relative_dir.as_posix()}`")
     lines.append("")
 
     subdirs = _subdirs(directory, exclude_dir_names)
     notes = _note_files(directory)
 
     if subdirs:
-        lines.extend(["## 子目录", ""])
+        lines.extend(["## Subdirectories" if english else "## 子目录", ""])
         for subdir in subdirs:
             note_count = len(_note_files(subdir))
             child_count = len(_subdirs(subdir, exclude_dir_names))
+            counts = (f" · {note_count} notes · {child_count} subdirectories" if english
+                      else f" · {note_count} 篇笔记 · {child_count} 个子目录")
             lines.append(
                 f"- [[{_wikilink(subdir / f'{subdir.name}.md', vault_root)}|{subdir.name}]]"
-                f" · {note_count} 篇笔记 · {child_count} 个子目录"
+                + counts
             )
         lines.append("")
 
     if notes:
-        lines.extend(["## 当前目录笔记", ""])
+        lines.extend(["## Notes in this directory" if english else "## 当前目录笔记", ""])
         for note in notes:
             lines.append(f"- [[{_wikilink(note, vault_root)}|{note.stem}]]")
         lines.append("")
 
     if not subdirs and not notes:
-        lines.extend(["## 当前目录笔记", "", "- 暂无内容", ""])
+        lines.extend(["## Notes in this directory" if english else "## 当前目录笔记", "",
+                      "- No content yet" if english else "- 暂无内容", ""])
 
     lines.extend(
         [
-            "## 说明",
+            "## About this index" if english else "## 说明",
             "",
-            "- 这个目录页由脚本自动生成。",
-            "- 你手动新增、移动或重命名笔记后，可以再运行一次“更新索引”。",
+            "- This index is generated automatically." if english else "- 这个目录页由脚本自动生成。",
+            '- Run “refresh indexes” after adding, moving, or renaming notes.' if english
+            else "- 你手动新增、移动或重命名笔记后，可以再运行一次“更新索引”。",
             "",
         ]
     )

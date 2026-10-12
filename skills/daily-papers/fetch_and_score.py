@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-fetch_and_score.py — Fetch a keyword shortlist, then let Jev select daily papers.
+fetch_and_score.py — Fetch candidates for host-agent ranking, or select with Jev/keywords.
 
-Keyword retrieval uses no model tokens. Jev semantic ranking reports its API usage.
+Default agent mode prepares a request; the host agent scores it in its current session.
+Explicit Jev mode calls TypeSafe and reports API usage. Keyword mode makes no model call.
 
 Usage:
-    python3 fetch_and_score.py --output selected.json
-    python3 fetch_and_score.py --date 2026-02-25 --output selected.json
+    python3 fetch_and_score.py --output candidates.json
+    python3 fetch_and_score.py --ranker jev --output selected.json
     python3 fetch_and_score.py --ranker keyword --output selected.json
 
-Stderr: progress logs. Stdout or --output: JSON array (default at most 10 * days).
+Stdout or --output: agent request object, or selected JSON array for jev/keyword modes.
 """
 from __future__ import annotations
 
@@ -30,6 +31,7 @@ if str(_SHARED_DIR) not in sys.path:
 
 from user_config import daily_papers_config, daily_papers_dir, temp_file_path
 from jev_ranker import RankingError, rank_papers
+from agent_ranker import prepare_request
 
 # ── Configuration ──────────────────────────────────────────────────────────
 
@@ -342,10 +344,11 @@ def load_fallback_ids(days: int = 7) -> set[str]:
     ids: set[str] = set()
     today = datetime.now().date()
     for d in range(1, days + 1):
-        fpath = DAILYPAPERS_DIR / f"{(today - timedelta(days=d)).isoformat()}-论文推荐.md"
-        if fpath.exists():
+        day = (today - timedelta(days=d)).isoformat()
+        for suffix in ("论文推荐", "paper-recommendations"):
+            fpath = DAILYPAPERS_DIR / f"{day}-{suffix}.md"
             try:
-                text = fpath.read_text()
+                text = fpath.read_text(encoding="utf-8")
                 for m in re.finditer(r"arxiv\.org/abs/(\d{4}\.\d{4,5})", text):
                     ids.add(m.group(1))
             except IOError:
@@ -451,8 +454,8 @@ def main():
     parser.add_argument("--date", help="Target date YYYY-MM-DD (default: today)")
     parser.add_argument("--days", type=int, default=1, help="Number of days to fetch (default: 1)")
     parser.add_argument("--output", type=Path, help="Write UTF-8 JSON directly, avoiding shell redirection encoding")
-    parser.add_argument("--ranker", choices=("jev", "keyword"), help="Override the configured ranking backend")
-    parser.add_argument("--candidates-output", type=Path, help="Save the pre-Jev shortlist for reproducible comparison")
+    parser.add_argument("--ranker", choices=("agent", "jev", "keyword"), help="Override the configured ranking backend")
+    parser.add_argument("--candidates-output", type=Path, help="Save the raw shortlist for reproducible comparison")
     parser.add_argument("--usage-output", type=Path, help="Save ranking calls, scores and actual API token usage")
     args = parser.parse_args()
 
@@ -467,13 +470,18 @@ def main():
         parser.error("daily_papers.top_n must be a positive integer")
     top_n = TOP_N * days
     backend = args.ranker or _CONFIG["ranking"]["backend"]
-    if backend not in ("jev", "keyword"):
-        parser.error("daily_papers.ranking.backend must be jev or keyword")
+    if backend not in ("agent", "jev", "keyword"):
+        parser.error("daily_papers.ranking.backend must be agent, jev or keyword")
     pool_size = _CONFIG["candidate_pool_size"]
     if type(pool_size) is not int or pool_size < TOP_N:
         parser.error("candidate_pool_size must be an integer greater than or equal to top_n")
     if backend == "jev" and not os.environ.get("TYPESAFE_API_KEY", "").strip():
-        parser.error("Set TYPESAFE_API_KEY for Jev, or explicitly use --ranker keyword")
+        parser.error("Set TYPESAFE_API_KEY for Jev, or use --ranker agent (no extra key) / --ranker keyword")
+
+    usage_path = args.usage_output or temp_file_path("daily_papers_ranking.json")
+    output_paths = [path.resolve() for path in (args.output, args.candidates_output, usage_path) if path is not None]
+    if len(set(output_paths)) != len(output_paths):
+        parser.error("Output, raw candidates, and ranking report must be different files")
 
     is_weekend = target_date.weekday() >= 5
     print(
@@ -489,23 +497,33 @@ def main():
     )
     if args.candidates_output:
         args.candidates_output.write_text(json.dumps(candidates, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    usage_path = args.usage_output or temp_file_path("daily_papers_ranking.json")
-    if backend == "jev":
+    if backend == "agent":
         try:
-            top, report = rank_papers(candidates, _CONFIG, top_n)
+            result = prepare_request(candidates, _CONFIG, top_n)
+        except ValueError as error:
+            parser.error(str(error))
+        result.update(date=target_date.isoformat(), days=days)
+        report = {"backend": "agent", "status": "awaiting_agent", "run_id": result["run_id"],
+                  "candidate_count": len(candidates), "selected_count": None,
+                  "requested_top_n": top_n, "usage": None, "usage_complete": False}
+        print(f"  Prepared {len(candidates)} candidates for the host agent; selection is pending.", file=sys.stderr)
+    elif backend == "jev":
+        try:
+            result, report = rank_papers(candidates, _CONFIG, top_n)
         except RankingError as error:
             usage_path.write_text(json.dumps(error.report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             parser.exit(1, f"Jev ranking failed: {error}. Partial report: {usage_path}\n")
     else:
-        top = candidates[:top_n]
+        result = candidates[:top_n]
         report = {"backend": "keyword", "status": "complete", "candidate_count": len(candidates),
-                  "selected_count": len(top), "usage": {"input_tokens": 0, "output_tokens": 0}}
+                  "selected_count": len(result), "usage": {"input_tokens": 0, "output_tokens": 0}}
     report["date"] = target_date.isoformat()
     report["days"] = days
     usage_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"  Selected {len(top)}/{top_n} papers with {backend}; usage: {usage_path}", file=sys.stderr)
+    if backend != "agent":
+        print(f"  Selected {len(result)}/{top_n} papers with {backend}; usage: {usage_path}", file=sys.stderr)
 
-    output = json.dumps(top, ensure_ascii=False, indent=2) + "\n"
+    output = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(output, encoding="utf-8")
     else:

@@ -8,7 +8,7 @@
 用户说一句话
     │
     ├─ "今日论文推荐" ──→ daily-papers（编排器）
-    │                        ├─ Step 1: daily-papers-fetch（Python 召回 + Jev 评分）
+    │                        ├─ Step 1: daily-papers-fetch（Python 召回 + Agent 评分（可选 Jev））
     │                        ├─ Step 2: daily-papers-review（Agent 点评）
     │                        └─ Step 3: daily-papers-notes（Agent + paper-reader）
     │
@@ -31,7 +31,7 @@
 
 ## Step 1: daily-papers-fetch
 
-**Python 负责抓取与召回；默认由 Jev Score 完成语义评分，记录真实 API usage。**
+**Python 负责抓取与召回；默认由当前 Agent 在会话内完成语义评分，Python 校验并选取，不需要额外 API key。Jev 和纯关键词模式可显式选择。**
 
 ### 1.1 抓取 + 打分（fetch_and_score.py）
 
@@ -53,9 +53,13 @@
 - 多天模式（days > 1）：跳过历史去重
 - 候选不足 20 篇时从历史回补
 
-语义评分：关键词候选池默认每日最多 30 篇，Jev 按 `research_interests` 逐篇评分，过滤低于阈值的论文后取最多 10 篇。共享兴趣作为 state，每道问题只附当前论文，避免为每个判断重复带入其他候选摘要。失败停止，不静默换后端。原始请求、答案、概率、耗时与 usage 保存在 `daily_papers_ranking.json`。
+默认语义评分：关键词候选池每日最多 30 篇。`fetch_and_score.py --ranker agent --output .../daily_papers_candidates.json` 写入候选请求对象，包含唯一 `run_id`、研究兴趣、0–4 rubric、top-N 与最低分，报告状态为 `awaiting_agent`。当前 Agent 阅读每个候选的标题和摘要，写入同一 `run_id` 的全量 `{id, score, reason}`。
 
-输出：`{TEMP_DIR}/daily_papers_selected.json`。`--output` 直接写 UTF-8 JSON；省略时仍写 stdout。
+`_shared/agent_ranker.py REQUEST SCORES --output .../daily_papers_selected.json` 验证运行匹配、候选无遗漏/重复/越界、分数有限且在 0–4 内、理由非空，再按语义分、关键词分、URL 排序，过滤阈值并截取 `top_n × days`。只有校验成功才输出最终论文数组，包含 `keyword_score`、归一化的 `score` 和 `agent.score/reason`。
+
+`daily_papers_ranking.json` 保留请求、响应与入选 URL，状态变为 `complete`。当前会话的 token 用量不由脚本掌握，`usage=null`、`usage_complete=false`；不伪造概率、confidence 或 API usage。空候选也经过同一协议，返回空结果。
+
+显式 `--ranker jev` 才检查 `TYPESAFE_API_KEY` 并调用 Jev，保留现有的真实 usage、分布和失败报告；显式 `keyword` 直接按召回分选取。两者直接输出最终数组。任何模式失败都不静默切换。`--output` 直接写 UTF-8；省略时输出 stdout。Jev 的 `--candidates-output` 原始数组和已有 benchmark 接口保持兼容。
 
 ### 1.2 元数据富化（enrich_papers.py）
 
@@ -306,7 +310,7 @@ hash 路由：`route(pattern, handler)` + `resolve()`。列表/详情页复用�
     "top_n": 10,
     "candidate_pool_size": 30,
     "research_interests": ["LLM RL and RL infrastructure", "JEPA world models", "Dexterous manipulation and physics simulation"],
-    "ranking": {"backend": "jev", "model": "jev-1.13.0", "batch_size": 30, "min_score": 2.0}
+    "ranking": {"backend": "agent", "model": "jev-1.13.0", "batch_size": 30, "min_score": 2.0}
   },
   "automation": {
     "auto_refresh_indexes": true,
