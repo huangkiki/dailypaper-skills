@@ -41,6 +41,8 @@ python3 install.py --target ~/.codex/skills --update
 
 原安装目录的 `user-config.json`、`user-config.local.json` 会保留；更新脚本时不要顺手把旧配置替换为仓库模板。迁移到共享配置可从旧安装目录执行 `python3 _shared/user_config.py --init`。共享配置已存在时，该命令不会覆盖或自动合并两个用户配置。
 
+新安装默认 `daily_papers.ranking.backend=agent`，直接由当前宿主会话评分，无需额外 API key。升级仍保留旧配置中的 `jev` 选择；需要免额外密钥时显式将有效个人配置改为 `agent`。这不会安装新模型、启动独立 CLI 或新增 API 供应商。
+
 多 Agent 并行使用时，为每次运行设置独立的 `DAILYPAPER_TEMP_DIR`，避免中间 JSON 互相覆盖；同一天的推荐与 `.history.json` 仍应串行写入。
 
 ## 验证边界

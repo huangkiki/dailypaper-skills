@@ -11,8 +11,8 @@ Usage:
 The script:
 1. Scans the notes directory for existing paper notes
 2. Matches papers in the recommendation file with existing notes
-3. Inserts note links after the "来源" line for each matched paper
-4. Updates the "分流表" section to use the correct wikilink names
+3. Inserts note links after the "来源" / "Source" line for each matched paper
+4. Updates "分流表" / "Reading priorities" to use the actual note filenames
 """
 
 import argparse
@@ -24,29 +24,29 @@ _SHARED_DIR = Path(__file__).resolve().parent.parent / "_shared"
 if str(_SHARED_DIR) not in sys.path:
     sys.path.insert(0, str(_SHARED_DIR))
 
-from user_config import obsidian_vault_path, paper_notes_dir
-
-NOTES_DIR = paper_notes_dir()
+from user_config import paper_notes_dir, paths_config
 
 
-def scan_notes() -> dict:
+def scan_notes(notes_dir: Path | None = None) -> dict:
     """Scan notes directory and build index of {method_name: note_path}."""
     notes_index = {}
+    notes_dir = notes_dir if notes_dir is not None else paper_notes_dir()
+    concepts_path = notes_dir / paths_config()["concepts_folder"]
 
-    if not NOTES_DIR.exists():
+    if not notes_dir.exists():
         return notes_index
 
     # Scan all subdirectories (exclude _concept folder)
-    for md_file in NOTES_DIR.rglob('*.md'):
+    for md_file in notes_dir.rglob('*.md'):
         # Skip concept notes
-        if '_概念' in str(md_file):
+        if md_file.is_relative_to(concepts_path) or md_file.stem == md_file.parent.name:
             continue
 
         # Use filename (without .md) as method name
         method_name = md_file.stem
         notes_index[method_name.lower()] = {
             'name': method_name,
-            'path': md_file.relative_to(NOTES_DIR.parent),
+            'path': md_file.relative_to(notes_dir.parent),
         }
 
     return notes_index
@@ -82,8 +82,8 @@ def match_papers_with_notes(content: str, notes_index: dict) -> list:
         section_start = m.start()
 
         # Find the next section end
-        next_section = re.search(r'^### (?:\d+\.|\w)', content[section_start + 1:], re.MULTILINE)
-        section_end = section_start + next_section.start() if next_section else len(content)
+        next_section = re.search(r'^#{1,3} ', content[m.end():], re.MULTILINE)
+        section_end = m.end() + next_section.start() if next_section else len(content)
 
         section_content = content[section_start:section_end]
 
@@ -91,14 +91,14 @@ def match_papers_with_notes(content: str, notes_index: dict) -> list:
         method_name = extract_method_name_from_title(paper_title)
 
         # Look for "来源" line
-        source_match = re.search(r'^- \*\*来源\*\*:.*$', section_content, re.MULTILINE)
+        source_match = re.search(r'^- \*\*(来源|Source)\*\*:.*$', section_content, re.MULTILINE)
         if not source_match:
             continue
 
         source_line_end = source_match.end()
 
         # Check if note link already exists
-        if re.search(r'- 📒 \*\*笔记\*\*:', section_content):
+        if re.search(r'- 📒 \*\*(?:笔记|已有笔记|Note|Existing note)\*\*:', section_content):
             continue  # Already has note link
 
         # Try to match with existing notes
@@ -108,6 +108,7 @@ def match_papers_with_notes(content: str, notes_index: dict) -> list:
                 'paper_title': paper_title,
                 'method_name': method_name,
                 'note_name': notes_index[method_lower]['name'],
+                'note_label': 'Note' if source_match.group(1) == 'Source' else '笔记',
                 'section_start': section_start,
                 'source_line_end': section_start + source_line_end,
             })
@@ -128,7 +129,7 @@ def backfill_links(recommendation_path: Path, notes_index: dict) -> int:
 
     # Insert note links (in reverse order to preserve positions)
     for match in reversed(matches):
-        insert_text = f'\n- 📒 **笔记**: [[{match["note_name"]}]]'
+        insert_text = f'\n- 📒 **{match["note_label"]}**: [[{match["note_name"]}]]'
         content = (
             content[:match['source_line_end']] +
             insert_text +
@@ -150,7 +151,7 @@ def update_diversion_table(recommendation_path: Path, notes_index: dict, matches
         content = f.read()
 
     # Find 分流表 section
-    table_match = re.search(r'^## 分流表$.+?(?=^##|\Z)', content, re.MULTILINE | re.DOTALL)
+    table_match = re.search(r'^## (?:分流表|Reading priorities)$.+?(?=^##|\Z)', content, re.MULTILINE | re.DOTALL)
     if not table_match:
         return
 
@@ -160,13 +161,7 @@ def update_diversion_table(recommendation_path: Path, notes_index: dict, matches
 
     # Update wikilinks for papers that have notes
     for match in matches:
-        # Find the paper in the table and update its wikilink
-        # Pattern: [[current_link]]（description）
-        old_pattern = rf'\[\[([^\]]+)\]\]（[^)]*{re.escape(match["method_name"])}[^)]*）'
-        new_text = f'[[{match["note_name"]}]]'
-
-        # Check if the link needs updating
-        if match['method_name'].lower() != match['note_name'].lower():
+        if match['method_name'] != match['note_name']:
             # Update the wikilink but keep the description
             table_content = re.sub(
                 rf'\[\[{re.escape(match["method_name"])}\]\]',
@@ -195,7 +190,7 @@ def main():
         sys.exit(1)
 
     # Scan notes
-    notes_index = scan_notes()
+    notes_index = scan_notes(Path(args.notes_dir) if args.notes_dir else None)
     print(f"Found {len(notes_index)} paper notes")
 
     # Backfill links

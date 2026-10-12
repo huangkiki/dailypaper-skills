@@ -129,7 +129,7 @@ DEFAULT_CONFIG = {
         ],
         "candidate_pool_size": 30,
         "ranking": {
-            "backend": "jev",
+            "backend": "agent",
             "model": "jev-1.13.0",
             "batch_size": 30,
             "min_score": 2.0

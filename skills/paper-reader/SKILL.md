@@ -11,6 +11,13 @@ description: |
   **重要触发词**: "读一下 XXX"、"读一下这篇"、"帮我读" → 必须调用此 skill
 ---
 
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
+
 ## 执行环境
 
 开始前读取 [Agent 运行约定](../_shared/agent-runtime.md)，解析当前 Skill 目录、有效配置和 `TEMP_DIR`，再执行下文。

@@ -1,5 +1,7 @@
 # 笔记质量详细规范
 
+英文输出沿用相同完整性要求，标题和说明使用英文；Figure 标题无需附中文译名。见 [English template](../assets/paper-note-template.en.md)。
+
 ## 公式质量检查
 
 > 教训（DreamerV1 事件）: 公式不仅要"有"，还要"对"。

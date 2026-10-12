@@ -21,6 +21,8 @@ from user_config import obsidian_vault_path, paths_config  # noqa: E402
 
 PERIOD_LABEL = {"daily": "日榜", "weekly": "周榜", "monthly": "月榜"}
 PERIOD_UNIT = {"daily": "今日", "weekly": "本周", "monthly": "本月"}
+EN_PERIOD_LABEL = {"daily": "Daily", "weekly": "Weekly", "monthly": "Monthly"}
+EN_PERIOD_UNIT = {"daily": "today", "weekly": "this week", "monthly": "this month"}
 
 
 def log(msg: str) -> None:
@@ -32,8 +34,10 @@ def target_dir() -> Path:
     return obsidian_vault_path() / folder
 
 
-def note_filename(period: str, today: date) -> str:
+def note_filename(period: str, today: date, output_language: str = "zh") -> str:
     label = PERIOD_LABEL.get(period, "榜单")
+    if output_language == "en":
+        label = " " + EN_PERIOD_LABEL[period]
     if period == "weekly":
         iso = today.isocalendar()
         return f"{iso.year}-W{iso.week:02d} GitHub{label}.md"
@@ -44,9 +48,13 @@ def md_escape(text: str) -> str:
     return text.replace("|", "\\|").replace("\n", " ").strip()
 
 
-def build_markdown(repos: list[dict], period: str, today: date, projects: dict | None = None) -> str:
-    unit = PERIOD_UNIT.get(period, "")
-    label = PERIOD_LABEL.get(period, "榜单")
+def build_markdown(repos: list[dict], period: str, today: date, projects: dict | None = None,
+                   output_language: str = "zh") -> str:
+    if output_language not in {"zh", "en"}:
+        raise ValueError("output_language must be zh or en")
+    english = output_language == "en"
+    unit = EN_PERIOD_UNIT[period] if english else PERIOD_UNIT.get(period, "")
+    label = EN_PERIOD_LABEL[period] if english else PERIOD_LABEL.get(period, "榜单")
     relevant = [r for r in repos if r.get("relevant")]
 
     lines: list[str] = []
@@ -60,45 +68,55 @@ def build_markdown(repos: list[dict], period: str, today: date, projects: dict |
     lines.append(f"# GitHub {label} · {today.isoformat()}")
     lines.append("")
     lines.append(
-        f"> {unit} star 涨得最快的 {len(repos)} 个项目，其中 **{len(relevant)}** 个与你的研究方向相关。"
+        f"> {len(repos)} trending repositories {unit}; **{len(relevant)}** match your research interests."
+        if english else f"> {unit} star 涨得最快的 {len(repos)} 个项目，其中 **{len(relevant)}** 个与你的研究方向相关。"
     )
     lines.append("")
 
     if relevant:
-        lines.append("## 🎯 与研究方向相关")
+        lines.append("## 🎯 Relevant to your research" if english else "## 🎯 与研究方向相关")
         lines.append("")
         for r in relevant:
-            kws = "、".join(r.get("matched_keywords", []))
+            kws = (", " if english else "、").join(r.get("matched_keywords", []))
             lang = f" · `{r['language']}`" if r.get("language") else ""
+            total = f" (total {r['stars_total']:,})" if english else f"（累计 {r['stars_total']:,}）"
             lines.append(
                 f"- **[{r['repo']}]({r['url']})** — ⭐ +{r['stars_period']:,} {unit}"
-                f"（累计 {r['stars_total']:,}）{lang}"
+                f"{total}{lang}"
             )
             if r.get("description"):
                 lines.append(f"  - {r['description']}")
             if kws:
-                lines.append(f"  - 命中关键词: {kws}")
+                lines.append(f"  - Matched keywords: {kws}" if english else f"  - 命中关键词: {kws}")
         lines.append("")
 
     if projects is not None:
-        lines.extend(["## 仿真新项目与生态更新", "",
-                      f"检索范围：{projects['start_date']} 至 {projects['end_date']}；按主题发现，不限已知项目名。",
-                      "每个检索式最多取 10 项，不保证穷尽；代码推送不等于新版本发布。", ""])
+        lines.extend([
+            "## New simulation projects and ecosystem updates" if english else "## 仿真新项目与生态更新", "",
+            f"Search window: {projects['start_date']} to {projects['end_date']}; topic-based discovery, not a fixed project list."
+            if english else f"检索范围：{projects['start_date']} 至 {projects['end_date']}；按主题发现，不限已知项目名。",
+            "At most 10 results per query; coverage is not exhaustive. A code push is not a release."
+            if english else "每个检索式最多取 10 项，不保证穷尽；代码推送不等于新版本发布。", ""])
         if projects.get("status") != "complete":
-            lines.extend(["> 部分检索失败或结果不完整；空列表不能证明没有新项目。", ""])
-        for key, heading in (("new_projects", "期间新建"), ("recently_updated", "已有项目近期更新")):
+            lines.extend(["> Some searches failed or returned incomplete results; an empty list does not prove there are no new projects."
+                          if english else "> 部分检索失败或结果不完整；空列表不能证明没有新项目。", ""])
+        headings = (("new_projects", "Newly created" if english else "期间新建"),
+                    ("recently_updated", "Recently updated" if english else "已有项目近期更新"))
+        for key, heading in headings:
             lines.extend([f"### {heading}", ""])
             items = projects.get(key, [])
             for repo in items:
-                lines.append(f"- [{repo['repo']}]({repo['url']}) — {md_escape(repo['description'])} "
-                             f"（⭐ {repo['stars']:,}；创建 {repo['created_at'][:10]}；推送 {repo['pushed_at'][:10]}）")
+                details = (f"(⭐ {repo['stars']:,}; created {repo['created_at'][:10]}; pushed {repo['pushed_at'][:10]})"
+                           if english else f"（⭐ {repo['stars']:,}；创建 {repo['created_at'][:10]}；推送 {repo['pushed_at'][:10]}）")
+                lines.append(f"- [{repo['repo']}]({repo['url']}) — {md_escape(repo['description'])} {details}")
             if not items:
-                lines.append("本次检索未返回项目。")
+                lines.append("No projects returned by this search." if english else "本次检索未返回项目。")
             lines.append("")
 
-    lines.append(f"## 📊 完整{label}")
+    lines.append(f"## 📊 Full {label.lower()} ranking" if english else f"## 📊 完整{label}")
     lines.append("")
-    lines.append(f"| # | 项目 | {unit}新增⭐ | 累计⭐ | 语言 | 相关 | 简介 |")
+    lines.append(f"| # | Repository | Stars {unit} | Total stars | Language | Relevant | Description |"
+                 if english else f"| # | 项目 | {unit}新增⭐ | 累计⭐ | 语言 | 相关 | 简介 |")
     lines.append("| --- | --- | ---: | ---: | --- | :---: | --- |")
     for r in repos:
         flag = "✅" if r.get("relevant") else ""
@@ -112,7 +130,8 @@ def build_markdown(repos: list[dict], period: str, today: date, projects: dict |
         )
     lines.append("")
     lines.append(
-        f"*生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')} · 数据源 github.com/trending?since={period}*"
+        f"*Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} · Source: github.com/trending?since={period}*"
+        if english else f"*生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')} · 数据源 github.com/trending?since={period}*"
     )
     lines.append("")
     return "\n".join(lines)
@@ -123,11 +142,13 @@ def main() -> int:
     parser.add_argument("input", type=Path)
     parser.add_argument("--projects", type=Path, help="Optional discover_projects.py result")
     parser.add_argument("--period", choices=tuple(PERIOD_LABEL), default="weekly")
+    parser.add_argument("--output-language", choices=("zh", "en"), default="zh",
+                        help="Language of the note; unrelated to the programming-language filter")
     args = parser.parse_args()
     data = json.loads(args.input.read_text(encoding="utf-8"))
     projects = json.loads(args.projects.read_text(encoding="utf-8")) if args.projects else None
     if not data and projects is None:
-        log("⚠️  输入为空，未生成笔记")
+        log("⚠️  Empty input; no note generated" if args.output_language == "en" else "⚠️  输入为空，未生成笔记")
         return 1
 
     period = data[0].get("period", args.period) if data else args.period
@@ -135,10 +156,10 @@ def main() -> int:
 
     out_dir = target_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / note_filename(period, today)
+    out_path = out_dir / note_filename(period, today, args.output_language)
 
-    out_path.write_text(build_markdown(data, period, today, projects), encoding="utf-8")
-    log(f"✅ 已写入: {out_path}")
+    out_path.write_text(build_markdown(data, period, today, projects, args.output_language), encoding="utf-8")
+    log(f"✅ Written: {out_path}" if args.output_language == "en" else f"✅ 已写入: {out_path}")
     print(str(out_path))
     return 0
 

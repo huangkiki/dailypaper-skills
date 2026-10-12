@@ -1,11 +1,20 @@
 ---
 name: daily-papers-notes
 description: |
+  Generate full notes for must-read recommendations, maintain concepts, and backfill links. English triggers: "generate paper notes", "batch paper notes". This is pipeline stage 3.
+
   论文笔记生成（3 步流水线的第 3 步）。补充概念库，为推荐论文生成完整笔记，
   链接回填到推荐文件；目录页默认自动刷新，git 自动化默认关闭。
 
   触发词："批量笔记"、"跑一下论文笔记"
 ---
+
+## Language / 语言
+
+First resolve `OUTPUT_LANGUAGE` using [language selection](../_shared/language.md).
+For an English request (or an explicit request for English), read and follow
+[the English workflow](SKILL.en.md) instead of the Chinese body below.
+中文请求继续执行下文；用户明确指定的语言优先。内部阶段继承语言，不从论文或工具输出重新判断。
 
 ## 执行环境
 
@@ -31,6 +40,7 @@ description: |
 - `GIT_COMMIT_ENABLED`
 - `GIT_PUSH_ENABLED`
 - `ENRICHED_INPUT = {TEMP_DIR}/daily_papers_enriched.json`
+- `RECOMMENDATION_PATH`：上阶段传入的实际推荐文件路径；独立调用时按日期定位中/英文文件，如两份均存在且无法确定本次目标，先确认目标再写入。
 
 其中：
 
@@ -44,7 +54,7 @@ description: |
 ## 前置检查
 
 1. 检查 `{TEMP_DIR}/daily_papers_enriched.json` 是否存在
-2. 检查今天的推荐文件 `{DAILY_PAPERS_PATH}/YYYY-MM-DD-论文推荐.md` 是否存在
+2. 检查今天的推荐文件 `{RECOMMENDATION_PATH}` 是否存在
 3. 如果任一不存在，告知用户需要先运行前置步骤，然后停止
 
 ## 工作流程
@@ -74,11 +84,11 @@ description: |
 
 为推荐论文生成完整论文笔记：
 
-1. 从今天的推荐文件中，读取分流表，筛选出标记为"必读"的论文（"值得看"和"可跳过"的不生成笔记）
+1. 从今天的推荐文件中，读取分流表，筛选出标记为"必读"或 "Must read" 的论文（"值得看"和"可跳过"的不生成笔记）
 2. **质量检查已有笔记**（不是只看文件是否存在）：
-   - 对已有 `📒 **笔记**` 标记的论文，用 Glob 找到对应笔记文件，检查行数
-   - **行数 < 100 的视为骨架笔记，必须重新生成**（删除旧文件，重新调用 paper-reader）
-   - 行数 >= 100 且包含 `## 关键公式` 和 `## 关键图表` 的才算合格，可以跳过
+   - 对已有 `📒 **笔记**` / `📒 **已有笔记**` / `📒 **Note**` / `📒 **Existing note**` 标记的论文，用 Glob 找到对应笔记文件，检查行数
+   - **行数 < 100 的视为骨架笔记，必须重新生成**（保留有效内容，重新调用 paper-reader 补全）
+   - 行数 >= 100 且包含 `## 关键公式` / `## Key equations` 和 `## 关键图表` / `## Figures and tables` 的才算合格，可以跳过
 3. 对每篇需要生成/重新生成的论文，执行 [paper-reader](../paper-reader/SKILL.md)（传入 arXiv 链接）
    - **不要指定固定的输出路径**，让 paper-reader 自行决定文件名和分类目录
    - paper-reader 会用方法名缩写作为文件名（如 `DAPL.md`），并自动分类到正确子目录
@@ -103,8 +113,8 @@ description: |
 1. 文件行数 >= 120（低于此值说明内容不完整）
 2. 包含 `$$` 或 `$` LaTeX 公式（至少 2 处）
 3. 包含 `![` 图片引用（至少 1 张）
-4. 包含 `## 关键公式` 和 `## 实验结果` section header
-5. 如果任一条件不满足，**删除文件并重新生成**
+4. 包含 `## 关键公式` / `## Key equations` 和 `## 实验结果` / `## 实验` / `## Experiments` section header
+5. 若检查未通过，对照原论文修复并复核；保留已有有效内容。行数只是骨架筛查，不能为凑行数、公式或图片数量编造内容；原论文本身没有某类内容时明确注明。
 
 ### Step 3: 笔记链接回填
 
@@ -116,13 +126,15 @@ description: |
 
 **3b: 匹配论文与笔记**
 
-读取当天推荐文件 `{DAILY_PAPERS_PATH}/YYYY-MM-DD-论文推荐.md`，对每篇论文（`### N.` 开头的段落）：
+读取当天推荐文件 `{RECOMMENDATION_PATH}`，对每篇论文（`### N.` 开头的段落）：
 
 1. 从论文标题中提取方法名/模型名（通常是标题冒号前的缩写，如 "DM0"、"BPP"、"PA3FF"）
 2. 与 3a 的笔记索引匹配（不区分大小写）
 3. 也检查富化数据的 `method_names`（如果有残留数据）
 
 **3c: 插入笔记链接 + 修正分流表**
+
+回填现有文件时保留文件的标签语言：中文 `来源` / `笔记` / `已有笔记` / `分流表` 对应英文 `Source` / `Note` / `Existing note` / `Reading priorities`。可运行 `python3 backfill_links.py --recommendation "{RECOMMENDATION_PATH}" --notes-dir "{NOTES_PATH}"`，并检查未匹配项。
 
 对匹配到笔记的论文，在 `- **来源**:` 行之后插入一行：
 
