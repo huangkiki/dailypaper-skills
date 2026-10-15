@@ -1,74 +1,74 @@
 # dailypaper-skills 🗞️
 
-[English](README.en.md) | **简体中文**
+**English** | [简体中文](README.zh-CN.md)
 
-**每天一句话，筛论文、看锐评，把值得读的研究变成自己的笔记。**
+**One daily prompt to find relevant papers, get candid reviews, and turn the best ones into research notes.**
 
-这是我自己平时追论文、读论文用的一套 Agent skills。从 HuggingFace 和 arXiv 找新论文，按研究兴趣挑重点，再把重点论文读完，整理成带公式、图表和概念链接的 Markdown 笔记。
+These are the Agent skills I use to keep up with research. They find papers on Hugging Face and arXiv, select them around your interests, and read priority papers in depth, saving Markdown notes with equations, figures, and links to technical concepts.
 
 ```text
-今日论文推荐
+Recommend today's papers.
 ```
 
-一次跑完 **抓取 → 筛选 → 点评 → 重点论文笔记**。也可以直接给一篇论文，让它精读。
+One request runs **discovery → selection → review → priority paper notes**. You can also start with a paper you already want to read.
 
-[🎬 看演示](#-先看效果) · [🧭 常用指令](#-平时怎么用) · [🚀 开始使用](#-开始使用) · [📖 详细指南](docs/usage.md)
+[🎬 Demo](#-see-it-in-use) · [🧭 Prompts](#-everyday-prompts) · [🚀 Get started](#-get-started) · [📖 Detailed guide (Chinese)](docs/usage.md)
 
-## 🎬 先看效果
+## 🎬 See it in use
 
-> ### [▶ 用 Claude Code 打造我的论文流水线｜小红书视频](http://xhslink.com/o/1dhQCn40EWY)
+> ### [▶ My paper-reading workflow with Claude Code｜Xiaohongshu video](http://xhslink.com/o/1dhQCn40EWY)
 >
-> 我录的一段实际使用演示。想先看看这套东西怎么用，可以从这里开始。
+> A recording of how I use the skills, in Chinese.
 >
-> 视频展示的是早期 Claude Code 工作流；当前版本也提供 Codex、Cursor 等 Agent 的安装入口，安装方法以下文为准。
+> The video shows the earlier Claude Code workflow. The current bundle also provides installation targets for Codex, Cursor, and other agents; follow the setup below for the current version.
 
-跑完后，你会拿到三类相互链接的内容：
+A run produces three connected kinds of content:
 
-| 产物 | 你可以用它做什么 |
+| Output | What you use it for |
 | --- | --- |
-| 🗞️ **每日推荐页** | 先看“必读 / 值得看 / 可跳过”，决定今天读哪几篇；默认每天最多推荐 10 篇 |
-| 📝 **重点论文笔记** | 跟着研究问题、方法、公式、图表、实验和局限读懂一篇论文 |
-| 🔗 **概念笔记与目录** | 遇到术语顺着链接查，读到相关方法时找到以前的积累 |
+| 🗞️ **Daily recommendations** | Choose what to read from “must read / worth a look / skip”; up to 10 recommendations per day by default |
+| 📝 **Priority paper notes** | Work through the research question, method, equations, figures, experiments, and limitations |
+| 🔗 **Concept notes and indexes** | Follow unfamiliar terms and reconnect new methods with previous reading |
 
-**点评是这套 skills 的一个重点。** 每篇都要说清楚：做了什么、和你的研究有什么关系、哪个设计值得借鉴、哪些结论还需要追问。可以尖锐，但要给出依据；摘要里没说的内容，会标明需要全文确认。
+**The commentary is a core part of the workflow.** Each recommendation explains what the method does, why it relates to your work, what you can reuse, and which claims deserve scrutiny. Criticism needs evidence; anything the abstract leaves unclear is marked for a full-text check.
 
-推荐页链接到重点论文，论文再链接到 `[[概念]]`。以下是默认目录下的产物结构示意，文件名和分类会随实际内容变化：
+Recommendations link to paper notes, which link to `[[concepts]]`. This illustrates the output structure with the default folder names; paper names and categories depend on the actual run:
 
 ```text
-你的笔记目录/
+your-notes/
 ├── DailyPapers/
-│   └── YYYY-MM-DD-论文推荐.md    ← 今日锐评、阅读优先级、逐篇点评
+│   └── YYYY-MM-DD-paper-recommendations.md
 └── 论文笔记/
-    ├── 具体分类/MethodName.md    ← 方法、公式、图表、实验与局限
-    └── _概念/主题/Concept.md     ← 定义、相关方法、关联论文
+    ├── category/MethodName.md
+    └── _概念/topic/Concept.md
 ```
 
-[查看完整论文笔记模板](obsidian-templates/论文笔记模板.md)。用 Obsidian 浏览双向链接很方便，也可以用普通 Markdown 编辑器或项目自带的 [Web Viewer](docs/usage.md#可选在浏览器里看笔记)。
+Existing folder names are preserved when you switch languages; you can configure your own. See the [English paper-note template](skills/paper-reader/assets/paper-note-template.en.md). Read the files in Obsidian, a Markdown editor, or the optional [Web Viewer (setup in Chinese)](docs/usage.md#可选在浏览器里看笔记).
 
-## 🧭 平时怎么用
+## 🧭 Everyday prompts
 
-装好后，在 Agent 对话里说你想做什么：
+After installation, ask your agent what you want to do:
 
-| 场景 | 直接这样说 |
+| Situation | Ask your agent |
 | --- | --- |
-| 今天有哪些论文值得看 | `今日论文推荐` |
-| 几天没跟进，补一下 | `过去3天论文推荐` / `过去一周论文推荐` |
-| 精读指定论文 | `读一下这篇论文 <arXiv 链接或 PDF 路径>` |
-| 先抓住核心贡献 | `快速看一下这篇论文 <PDF 路径>` |
-| 带着问题看方法 | `批判性分析这篇论文 <PDF 路径>` |
-| 读已有收藏 | `读一下 Zotero 里的 Diffusion Policy` |
-| 看开源项目进展 | `GitHub 周榜` |
-| 移动笔记后刷新导航 | `更新索引` |
+| Find today's reading | `Recommend today's papers` |
+| Catch up | `Recommend papers from the past three days` or `Recommend papers from the past week` |
+| Read a specific paper | `Read this paper: <arXiv link or PDF path>` |
+| Get the core contribution | `Quickly summarize this paper: <PDF path>` |
+| Examine the limitations | `Critically analyze this paper: <PDF path>` |
+| Read your collection | `Read Diffusion Policy from my Zotero library` |
+| Follow open-source projects | `Show me weekly GitHub trending` |
+| Refresh navigation after moving notes | `Refresh paper and concept indexes` |
 
-**研究方向由你设置。** 默认关注大模型 RL、RL infra、世界模型 / JEPA、灵巧手与物理仿真；可以改成你自己的方向。推荐会结合历史去重，相关论文不足时不凑数。“必读”继续生成完整笔记，已有笔记会匹配并链接。
+**You choose the research interests.** Defaults cover LLM reinforcement learning, RL infrastructure, world models/JEPA, dexterous manipulation, and physics simulation. Recommendations use history to avoid repeats and do not pad a sparse list. Must-read papers continue to full notes; existing notes are matched and linked.
 
-**中英文跟随你的提问。** `Recommend papers from the past week` 会生成英文推荐和笔记；也可以明确说“用英文输出”或 “write in Chinese”。切换语言不会重命名已有目录和笔记。[语言说明](docs/usage.md#中英文自动切换)
+**English and Chinese follow your prompt.** Ask in English for English recommendations and notes, or explicitly request a language: `Read this paper, but write in Chinese`. Switching languages preserves existing folders, note names, and link targets. [Language rules](skills/_shared/language.md)
 
-## 🚀 开始使用
+## 🚀 Get started
 
-需要一个能读写文件、执行命令和联网的 Agent，以及 **Python 3.10+、Git、curl**。精读 PDF 需要 **Poppler**；Obsidian、Zotero 按需使用。[环境准备](docs/usage.md#1-准备运行环境)
+You need an agent with file, command, and web access, plus **Python 3.10+, Git, and curl**. Full PDF reading needs **Poppler**: `brew install poppler` on macOS, `sudo apt install poppler-utils` on Ubuntu/Debian, or `pdftotext` and `pdfimages` on `PATH` on Windows. Obsidian and Zotero are optional.
 
-### 1. 安装完整技能包
+### 1. Install the complete bundle
 
 ```bash
 git clone https://github.com/huangkiki/dailypaper-skills.git
@@ -76,84 +76,82 @@ cd dailypaper-skills
 python3 install.py --agent codex
 ```
 
-把 `codex` 换成你使用的 Agent：`claude`、`cursor`、`copilot`、`gemini`、`opencode` 或 `openclaw`。Windows 可将 `python3` 换成 `py -3`。安装器会一起复制七个技能及共享依赖。
+Replace `codex` with `claude`, `cursor`, `copilot`, `gemini`, `opencode`, or `openclaw`. On Windows, use `py -3` if needed. The installer copies all seven skills, both workflow languages, templates, and shared dependencies together.
 
-### 2. 告诉它你的研究方向和保存位置
+### 2. Set your interests and output directory
 
-先创建个人配置，已有配置不会被覆盖：
+Create the shared personal configuration; an existing configuration is preserved:
 
 ```bash
 python3 skills/_shared/user_config.py --init
 ```
 
-刷新或重启 Agent 会话，然后在对话中输入，替换成自己的目录和方向：
+Restart or refresh your agent session, then send this prompt with your own directory and interests:
 
 ```text
-帮我配置 dailypaper-skills，使用跨 Agent 的共享配置。
-把 Markdown 保存到 /path/to/my-research-notes。
-我关注 robot learning、VLA、世界模型和物理仿真。
-每天最多推荐 10 篇。
+Configure dailypaper-skills using the shared configuration.
+Save Markdown to /path/to/my-research-notes.
+I work on robot learning, VLA, world models, and physics simulation.
+Recommend at most 10 papers per day.
 ```
 
-**默认无需额外 API key。** 筛选、点评和精读使用当前 Agent 的模型额度。输出目录可以是普通文件夹，也可以是你指定的 Obsidian 库。
+**No extra API key is needed by default.** Selection, reviews, and full reading use your current agent's model allowance. Save to an ordinary local directory or an Obsidian vault you choose.
 
-### 3. 开始第一次推荐
+### 3. Run your first recommendation
 
 ```text
-今日论文推荐
+Recommend today's papers.
 ```
 
-Agent 会完成筛选、点评和重点论文笔记，并告诉你产物位置。想从一篇论文试起，也可以直接发送 `读一下这篇论文 <链接或 PDF 路径>`。
+The agent selects papers, writes reviews and priority notes, and returns their locations. To try a single paper first, ask `Read this paper: <link or PDF path>`. These are conversation prompts.
 
-升级、多 Agent 安装、自定义目录和排错见 [使用指南](docs/usage.md)。
+To upgrade, pull repository updates and rerun `python3 install.py --agent codex --update`, then refresh your session. For multiple agents or custom installation directories, see the [usage guide (Chinese)](docs/usage.md).
 
-## 🧩 里面有哪些 Skills
+## 🧩 Included skills
 
-日常用 `daily-papers` 追新论文，用 `paper-reader` 读指定论文。抓取、点评和笔记三个阶段会自动衔接，需要补跑时也能单独调用。
+Use `daily-papers` to follow new research and `paper-reader` for a specific paper. Fetching, review, and note generation connect automatically; each stage can also be rerun separately.
 
-| Skill | 负责什么 |
+| Skill | Role |
 | --- | --- |
-| [`daily-papers`](skills/daily-papers/SKILL.md) | 一句话启动完整每日论文流程 |
-| [`paper-reader`](skills/paper-reader/SKILL.md) | 精读、快速摘要、批判性分析；支持 arXiv、本地 PDF、Zotero |
-| [`daily-papers-fetch`](skills/daily-papers-fetch/SKILL.md) | 从 HuggingFace Daily / Trending 与 arXiv 抓取、筛选、富化 |
-| [`daily-papers-review`](skills/daily-papers-review/SKILL.md) | 生成锐评、阅读优先级和推荐页 |
-| [`daily-papers-notes`](skills/daily-papers-notes/SKILL.md) | 重点笔记、概念补充、链接回填 |
-| [`generate-mocs`](skills/generate-mocs/SKILL.md) | 更新论文和概念的目录页 |
-| [`github-trending`](skills/github-trending/SKILL.md) | 开源项目日榜 / 周榜 / 月榜，以及仿真主题检索 |
+| [daily-papers](skills/daily-papers/SKILL.en.md) | Run the complete daily paper workflow |
+| [paper-reader](skills/paper-reader/SKILL.en.md) | Full reading, quick summaries, and critical analysis of arXiv papers, local PDFs, or Zotero items |
+| [daily-papers-fetch](skills/daily-papers-fetch/SKILL.en.md) | Discover, select, and enrich papers from Hugging Face Daily/Trending and arXiv |
+| [daily-papers-review](skills/daily-papers-review/SKILL.en.md) | Write candid reviews, reading priorities, and recommendation pages |
+| [daily-papers-notes](skills/daily-papers-notes/SKILL.en.md) | Generate priority notes, add concepts, and backfill links |
+| [generate-mocs](skills/generate-mocs/SKILL.en.md) | Refresh paper and concept indexes |
+| [github-trending](skills/github-trending/SKILL.en.md) | Daily, weekly, and monthly project lists, plus simulation topic searches |
 
-我也会搭配 [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar)：用这套 skills 筛选和积累笔记，在 Zotero 里打开 PDF 时，用 Sidebar 即时问答、点译和追问。
+I also use [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar): these skills handle discovery and research notes, while Sidebar supports questions, translation, and follow-ups inside the PDF reader.
 
-## 💬 使用前你可能想知道
+## 💬 FAQ
 
-**必须用 Obsidian 吗？** 不需要，指定一个本地 Markdown 输出目录即可。Zotero 也只在读取自己的文献库时需要。
+**Do I need Obsidian?** No. A local Markdown directory is enough. Zotero is only needed when reading your Zotero library.
 
-**会每天自动运行、自动上传笔记吗？** 默认由你发起，安装不会创建定时任务；Git 自动提交、推送默认关闭。定时运行用宿主或系统调度，归档与同步按你指定的目标和授权执行。
+**Does it run every day or upload my notes automatically?** Runs start when requested. Installation creates no scheduled tasks, and automatic Git commit and push are disabled by default. Scheduling uses your host or system tools; archiving and synchronization follow your chosen destination and authorization.
 
-**这些 Agent 都能完整跑通吗？** 安装器提供多个目标，但完整流程需要文件、命令和网络能力。安装与脚本测试通过，不代表所有客户端都完成了端到端实测。[兼容与验证范围](docs/agents.md)
+**Has every agent been tested end to end?** The installer supports multiple targets, but the full workflow needs file, command, and web access. Installation and script checks do not establish end-to-end validation for every client. [Compatibility details (Chinese)](docs/agents.md)
 
-**能换论文筛选方式吗？** 默认 `agent` 使用当前 Agent 评分，也可选 `keyword` 关键词筛选或 `jev` 专用 API；只有 Jev 需要额外的 `TYPESAFE_API_KEY`。[配置与旧版本迁移](docs/usage.md#3-配置并开始使用)
+**Can I change how papers are selected?** Set `daily_papers.ranking.backend` to `agent` (default), `keyword`, or `jev`. Only Jev needs an extra `TYPESAFE_API_KEY`. Upgrades preserve personal configuration; existing Jev users can switch the effective setting to `agent`. [Configuration and migration (Chinese)](docs/usage.md#3-配置并开始使用)
 
 <details>
-<summary>⚡ 可选 Jev：历史评分费用与耗时对照</summary>
+<summary>⚡ Optional Jev: recorded scoring cost and latency</summary>
 
-<!-- JEV_BENCHMARK_START -->
-2026-10-05 的一次对照中，同一批 30 篇候选、两组均选 10 篇：GPT-6 Astra 评分约 **$0.109264 / 10.35 秒**，Jev 1.13.0 约 **$0.000576408 / 0.52 秒**，入选重合 **9/10**。按当时标准 API 标价折算，评分费用降低 **99.47%**，调用约快 **20 倍**。
+In a single comparison on 2026-10-05, both models received the same 30 candidates and selected 10. GPT-6 Astra scoring took **$0.109264 / 10.35 s**, versus **$0.000576408 / 0.52 s** for Jev 1.13.0, with **9/10 selection overlap**. At the recorded standard API list prices, estimated scoring cost was **99.47% lower** and the call was about **20× faster**.
 
-这是计入主模型缓存的**单次评分环节测量**，不代表整个阅读流程的费用或账户实际账单；重合率也不等于人工质量评价。[原始证据与复现方法](docs/jev-benchmark.md)
-<!-- JEV_BENCHMARK_END -->
+These are historical **scoring-stage measurements** including the host model's reported cache usage, not a full-workflow cost or an account bill. Selection overlap is not a human quality evaluation. [Recorded evidence and reproduction (Chinese)](docs/jev-benchmark.md)
 
 </details>
 
-## 🛠️ 开发与贡献
+## 🛠️ Development
 
-[架构说明](ARCHITECTURE.md) · [Agent 接入](docs/agents.md) · [使用指南](docs/usage.md)
+[Architecture (Chinese)](ARCHITECTURE.md) · [Agent integration (Chinese)](docs/agents.md) · [Usage (Chinese)](docs/usage.md)
 
 ```bash
 python3 -m pip install -r web-viewer/requirements.txt
 python3 -m unittest discover -s tests -v
 ```
 
-欢迎分享用法、适配反馈，或提交 Issue / PR。反馈问题时请附 Agent 与系统版本、失败阶段，以及去除敏感信息的日志。
+Usage examples, adaptation feedback, issues, and pull requests are welcome. For bugs, include your agent/OS version, failing stage, and sanitized logs.
 
 [![Star History Chart](https://star-history.dera.page/svg?repos=huangkiki/dailypaper-skills&type=Date)](https://star-history.dera.page/#huangkiki/dailypaper-skills&Date)
 
