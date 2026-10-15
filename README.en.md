@@ -21,8 +21,6 @@ One request runs **discovery → selection → review → priority paper notes**
 > A recording of how I use the skills, in Chinese.
 >
 > The video shows the earlier Claude Code workflow. The current bundle also provides installation targets for Codex, Cursor, and other agents; follow the setup below for the current version.
->
-> The original share link may show an unavailable-note message. The output structure and note template below provide another way to see what the workflow produces.
 
 A run produces three connected kinds of content:
 
