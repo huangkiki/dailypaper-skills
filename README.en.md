@@ -2,88 +2,73 @@
 
 **English** | [简体中文](README.md)
 
-**Turn your agent into a research reading workflow: discover relevant papers, decide what deserves your attention, and build notes you can use again.**
+**One daily prompt to find relevant papers, get candid reviews, and turn the best ones into research notes.**
 
-Keeping up with research takes more than collecting links. dailypaper-skills finds papers that match your interests, critiques their methods and evidence, and reads the most useful ones in depth. You get connected Markdown notes with equations, figures, tables, and technical concepts.
-
-Ask your agent:
+These are the Agent skills I use to keep up with research. They find papers on Hugging Face and arXiv, select them around your interests, and read priority papers in depth, saving Markdown notes with equations, figures, and links to technical concepts.
 
 ```text
 Recommend today's papers.
 ```
 
-You get **up to 10 recommendations per day, clear reading priorities, and full notes for must-read papers**. Recommendation pages link to paper notes, which link to reusable concept notes.
+One request runs **discovery → selection → review → priority paper notes**. You can also start with a paper you already want to read.
 
-Built for **AI and robotics researchers, graduate students, and engineers following research**. Install it for Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode, or OpenClaw. Other agents can use the bundle if they can read instructions, run Python, access the web, and write files.
+[🎬 Demo](#-see-it-in-use) · [🧭 Prompts](#-everyday-prompts) · [🚀 Get started](#-get-started) · [📖 Detailed guide (Chinese)](docs/usage.md)
 
-[What you get](#-what-you-get) · [Skills](#-skills) · [Get started](#-get-started) · [Language selection](#-english-and-chinese) · [Usage guide (Chinese)](docs/usage.md) · [Video demo (Chinese)](http://xhslink.com/o/1dhQCn40EWY)
+## 🎬 See it in use
 
-## 🎁 What you get
+> ### [▶ My paper-reading workflow with Claude Code｜Xiaohongshu video](http://xhslink.com/o/1dhQCn40EWY)
+>
+> A recording of how I use the skills, in Chinese.
+>
+> The video shows the earlier Claude Code workflow. The current bundle also provides installation targets for Codex, Cursor, and other agents; follow the setup below for the current version.
+>
+> The original share link may show an unavailable-note message. The output structure and note template below provide another way to see what the workflow produces.
 
-### 🔎 A reading list shaped by your research
+A run produces three connected kinds of content:
 
-Discover papers from Hugging Face Daily/Trending and arXiv, filter by your configured interests, and avoid repeats using recommendation history. Catch up on three days or a whole week in one request. If too few relevant papers are available, the workflow does not pad the list.
-
-Each recommendation explains what the method does, why it matters to your work, what you can reuse, and what needs closer scrutiny. Original sources and existing notes remain linked.
-
-### 🎯 Clear, evidence-based priorities
-
-| Priority | What happens next |
+| Output | What you use it for |
 | --- | --- |
-| 🔥 Must read | Read the full paper and generate structured notes |
-| 👀 Worth a look | Understand the contribution; request a deeper reading if useful |
-| 💤 Skip | See why the relevance or contribution is limited |
+| 🗞️ **Daily recommendations** | Choose what to read from “must read / worth a look / skip”; up to 10 recommendations per day by default |
+| 📝 **Priority paper notes** | Work through the research question, method, equations, figures, experiments, and limitations |
+| 🔗 **Concept notes and indexes** | Follow unfamiliar terms and reconnect new methods with previous reading |
 
-The commentary is deliberately candid: specific about assumptions, experiment coverage, engineering cost, and the limits of the evidence. Missing information is marked as needing a full-text check. **By default, your current agent scores relevance and evaluates research value. Jev is an optional relevance-scoring backend.**
+**The commentary is a core part of the workflow.** Each recommendation explains what the method does, why it relates to your work, what you can reuse, and which claims deserve scrutiny. Criticism needs evidence; anything the abstract leaves unclear is marked for a full-text check.
 
-### 📝 Research notes that remain useful
+Recommendations link to paper notes, which link to `[[concepts]]`. This illustrates the output structure with the default folder names; paper names and categories depend on the actual run:
 
-Full notes cover the problem, method, equations, figures, tables, experiments, and critical assessment. Technical terms link to concept notes; the workflow backfills links into the recommendation page and refreshes navigation indexes.
+```text
+your-notes/
+├── DailyPapers/
+│   └── YYYY-MM-DD-paper-recommendations.md
+└── 论文笔记/
+    ├── category/MethodName.md
+    └── _概念/topic/Concept.md
+```
 
-| Artifact | Contents |
+Existing folder names are preserved when you switch languages; you can configure your own. See the [English paper-note template](skills/paper-reader/assets/paper-note-template.en.md). Read the files in Obsidian, a Markdown editor, or the optional [Web Viewer (setup in Chinese)](docs/usage.md#可选在浏览器里看笔记).
+
+## 🧭 Everyday prompts
+
+After installation, ask your agent what you want to do:
+
+| Situation | Ask your agent |
 | --- | --- |
-| Recommendation page | Research take, reading priorities, individual reviews, source and note links |
-| Paper notes | Method analysis, equations, figures, experiments, and limitations |
-| Concept notes and indexes | Definitions, related methods, and navigation through your research library |
+| Find today's reading | `Recommend today's papers` |
+| Catch up | `Recommend papers from the past three days` or `Recommend papers from the past week` |
+| Read a specific paper | `Read this paper: <arXiv link or PDF path>` |
+| Get the core contribution | `Quickly summarize this paper: <PDF path>` |
+| Examine the limitations | `Critically analyze this paper: <PDF path>` |
+| Read your collection | `Read Diffusion Policy from my Zotero library` |
+| Follow open-source projects | `Show me weekly GitHub trending` |
+| Refresh navigation after moving notes | `Refresh paper and concept indexes` |
 
-See the [English paper-note template](skills/paper-reader/assets/paper-note-template.en.md). Files are ordinary Markdown in your chosen local directory. Obsidian is useful for linked reading, but a Markdown editor or the optional Web Viewer also works.
+**You choose the research interests.** Defaults cover LLM reinforcement learning, RL infrastructure, world models/JEPA, dexterous manipulation, and physics simulation. Recommendations use history to avoid repeats and do not pad a sparse list. Must-read papers continue to full notes; existing notes are matched and linked.
 
-## 🧩 Skills
-
-| What you want | Ask your agent | Skill |
-| --- | --- | --- |
-| Today's research and priority notes | `Recommend today's papers` | [daily-papers](skills/daily-papers/SKILL.md) |
-| Catch up | `Recommend papers from the past week` | daily-papers |
-| Read a paper | `Read this paper: <arXiv link or PDF path>` | [paper-reader](skills/paper-reader/SKILL.md) |
-| Read your collection | `Read Diffusion Policy from my Zotero library` | paper-reader |
-| Get the gist | `Quickly summarize this paper: <PDF path>` | paper-reader |
-| Discover open-source projects | `Show me weekly GitHub trending` | [github-trending](skills/github-trending/SKILL.md) |
-| Refresh navigation | `Refresh paper and concept indexes` | [generate-mocs](skills/generate-mocs/SKILL.md) |
-
-The daily pipeline connects [fetch](skills/daily-papers-fetch/SKILL.md), [review](skills/daily-papers-review/SKILL.md), and [notes](skills/daily-papers-notes/SKILL.md). You can also ask to “fetch papers,” “review fetched papers,” or “generate paper notes” to rerun one stage.
-
-GitHub discovery combines Trending with topic searches for new simulation projects and recent updates. Daily, weekly, and monthly periods are supported. Default interests include LLM reinforcement learning, RL infrastructure, world models/JEPA, dexterous manipulation, and physics simulation. These are configurable; known engine names are examples, not a whitelist.
-
-## 🌐 English and Chinese
-
-**Ask in English to get the English workflow and output. Ask in Chinese to get Chinese.** No separate installation or language toggle is needed.
-
-| Request | Result |
-| --- | --- |
-| `Recommend papers from the past three days` | English, three-day window |
-| `过去三天论文推荐` | Chinese, three-day window |
-| `今日论文推荐，用英文输出` | English, today |
-| `Read this paper, but write the notes in Chinese` | Chinese notes |
-
-An explicit language request takes priority. All pipeline stages inherit the selected language. Paper titles, URLs, code, and quoted source text do not determine it. Ambiguous follow-ups retain the conversation's language; without context, the original Chinese default remains.
-
-New recommendations, paper/concept notes, generated index text, and summaries follow that language. Existing folders, note names, citations, and link targets are preserved. Original paper metadata and repository descriptions remain source text. This supports English skill workflows; it does not translate the optional Web Viewer UI or Claude daemon interface.
-
-For direct script use, the index generators and GitHub note writer accept `--output-language en` (default `zh`). GitHub's separate `--language python` flag filters programming languages. See the [shared language contract](skills/_shared/language.md).
+**English and Chinese follow your prompt.** Ask in English for English recommendations and notes, or explicitly request a language: `Read this paper, but write in Chinese`. Switching languages preserves existing folders, note names, and link targets. [Language rules](skills/_shared/language.md)
 
 ## 🚀 Get started
 
-You need an agent with file, command, and web access; **Python 3.10+, Git, and curl**; and **Poppler** for PDF text/image extraction. Install Poppler with `brew install poppler` on macOS or `sudo apt install poppler-utils` on Ubuntu/Debian. On Windows, make `pdftotext` and `pdfimages` available on `PATH`. Obsidian and Zotero are optional.
+You need an agent with file, command, and web access, plus **Python 3.10+, Git, and curl**. Full PDF reading needs **Poppler**: `brew install poppler` on macOS, `sudo apt install poppler-utils` on Ubuntu/Debian, or `pdftotext` and `pdfimages` on `PATH` on Windows. Obsidian and Zotero are optional.
 
 ### 1. Install the complete bundle
 
@@ -93,95 +78,82 @@ cd dailypaper-skills
 python3 install.py --agent codex
 ```
 
-Replace `codex` with `claude`, `cursor`, `copilot`, `gemini`, `opencode`, or `openclaw`. Use `py -3` instead of `python3` on Windows if needed. The installer copies all seven skills, both workflow languages, templates, and `_shared` dependencies. Do not copy a single skill file on its own.
-
-```bash
-# Multiple agents or a project-local destination:
-python3 install.py --agent claude codex
-python3 install.py --target "/path/to/project/.agents/skills"
-
-# Preview without writing:
-python3 install.py --agent codex --dry-run
-```
+Replace `codex` with `claude`, `cursor`, `copilot`, `gemini`, `opencode`, or `openclaw`. On Windows, use `py -3` if needed. The installer copies all seven skills, both workflow languages, templates, and shared dependencies together.
 
 ### 2. Set your interests and output directory
+
+Create the shared personal configuration; an existing configuration is preserved:
 
 ```bash
 python3 skills/_shared/user_config.py --init
 ```
 
-This prints the shared configuration path, normally `~/.config/dailypaper-skills/user-config.json` (respecting `XDG_CONFIG_HOME`). Existing personal configuration is preserved. Ask your agent:
+Restart or refresh your agent session, then send this prompt with your own directory and interests:
 
 ```text
 Configure dailypaper-skills using the shared configuration.
 Save Markdown to /path/to/my-research-notes.
-I work on robot learning, VLA, diffusion policies, and physics simulation.
+I work on robot learning, VLA, world models, and physics simulation.
 Recommend at most 10 papers per day.
 ```
 
-**No extra API key is needed by default.** Your current agent reads candidate abstracts, scores relevance, then reviews and reads the selected papers using its existing model/session allowance.
+**No extra API key is needed by default.** Selection, reviews, and full reading use your current agent's model allowance. Save to an ordinary local directory or an Obsidian vault you choose.
 
-Choose `daily_papers.ranking.backend`:
+### 3. Run your first recommendation
 
-| Mode | How papers are selected | Extra key |
-| --- | --- | --- |
-| `agent` (default) | Semantic scores from your current agent, validated before selection | None |
-| `jev` | TypeSafe Jev semantic scoring | `TYPESAFE_API_KEY` |
-| `keyword` | Keyword scores only | None |
+```text
+Recommend today's papers.
+```
 
-For optional Jev mode, set the key in the environment that starts your agent, never in a committed config file. Explicit Jev failures stop that mode instead of silently switching backends. Upgrades preserve personal configuration: if an older config says `jev`, change it to `agent` to use the new default without an extra key.
+The agent selects papers, writes reviews and priority notes, and returns their locations. To try a single paper first, ask `Read this paper: <link or PDF path>`. These are conversation prompts.
 
-Use `python3 skills/_shared/user_config.py` to inspect effective settings. Important fields include `paths.obsidian_vault` (any Markdown output directory), folder names, `daily_papers.research_interests`, keywords, `top_n`, and `ranking`. Zotero paths are needed only for Zotero access. English folder names can be configured explicitly; language switching never renames an existing library.
+To upgrade, pull repository updates and rerun `python3 install.py --agent codex --update`, then refresh your session. For multiple agents or custom installation directories, see the [usage guide (Chinese)](docs/usage.md).
 
-Configuration precedence is built-in defaults → bundled config → local config → shared personal config → `DAILYPAPER_CONFIG`; `OBSIDIAN_VAULT_PATH` overrides the output root last. Use a distinct `DAILYPAPER_TEMP_DIR` for concurrent runs.
+## 🧩 Included skills
 
-### 3. Ask for papers
+Use `daily-papers` to follow new research and `paper-reader` for a specific paper. Fetching, review, and note generation connect automatically; each stage can also be rerun separately.
 
-Restart or refresh your agent session and ask `Recommend today's papers`. The agent filters, reviews, reads priority papers, and returns the artifact locations. These are conversation prompts, not terminal commands.
+| Skill | Role |
+| --- | --- |
+| [daily-papers](skills/daily-papers/SKILL.en.md) | Run the complete daily paper workflow |
+| [paper-reader](skills/paper-reader/SKILL.en.md) | Full reading, quick summaries, and critical analysis of arXiv papers, local PDFs, or Zotero items |
+| [daily-papers-fetch](skills/daily-papers-fetch/SKILL.en.md) | Discover, select, and enrich papers from Hugging Face Daily/Trending and arXiv |
+| [daily-papers-review](skills/daily-papers-review/SKILL.en.md) | Write candid reviews, reading priorities, and recommendation pages |
+| [daily-papers-notes](skills/daily-papers-notes/SKILL.en.md) | Generate priority notes, add concepts, and backfill links |
+| [generate-mocs](skills/generate-mocs/SKILL.en.md) | Refresh paper and concept indexes |
+| [github-trending](skills/github-trending/SKILL.en.md) | Daily, weekly, and monthly project lists, plus simulation topic searches |
 
-To upgrade later, pull repository updates and rerun `python3 install.py --agent codex --update`. Personal configuration is preserved; refresh the agent session to load the updated skills.
-
-## ⚡ Optional: Jev for ranking
-
-You can enable Jev to delegate repeated relevance scoring to a dedicated API, while keeping research commentary and full reading in the host agent. In the repository's **single 2026-10-05 scoring comparison**, both models received the same 30 candidates and selected 10:
-
-| Scoring stage | GPT-6 Astra | Jev 1.13.0 |
-| --- | ---: | ---: |
-| Cost at recorded standard API list prices | $0.109264 | $0.000576408 |
-| API elapsed time | 10.35 s | 0.52 s |
-| Total tokens | 11,932 | 14,198 |
-
-That run had **99.47% lower estimated scoring cost**, about **20× lower API latency**, and **9/10 selection overlap**. Jev used more tokens but had a lower unit price. These are historical scoring-stage measurements including the host model's reported cache usage, not current pricing, a full-workflow cost, an account bill, or a human quality evaluation. [Recorded evidence and reproduction (Chinese)](docs/jev-benchmark.md)
-
-## 📚 Fit it into your reading workflow
-
-- **Obsidian**: Browse linked recommendations, paper notes, concepts, and indexes.
-- **Zotero**: Find papers by title or process requested collections using existing attachments.
-- **Browser**: Browse the same notes in the optional Web Viewer.
-- **Multiple agents**: Share research interests and output settings. Installation/script checks do not imply every host has passed end-to-end testing. [Compatibility details (Chinese)](docs/agents.md)
-
-[Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar) complements this workflow with questions, translation, and follow-ups while reading PDFs.
+I also use [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar): these skills handle discovery and research notes, while Sidebar supports questions, translation, and follow-ups inside the PDF reader.
 
 ## 💬 FAQ
 
 **Do I need Obsidian?** No. A local Markdown directory is enough. Zotero is only needed when reading your Zotero library.
 
-**Does installation schedule daily runs or publish my notes?** No. Runs start when requested; scheduling uses your host's facilities. Automatic Git commit and push are disabled by default. Saving or synchronizing to Obsidian follows your explicit destination and authorization.
+**Does it run every day or upload my notes automatically?** Runs start when requested. Installation creates no scheduled tasks, and automatic Git commit and push are disabled by default. Scheduling uses your host or system tools; archiving and synchronization follow your chosen destination and authorization.
 
-**Can a chat-only client run this?** The full local pipeline requires commands and filesystem access. Cloud/sandbox agents also need dependencies and access to the output directory in their actual execution environment.
+**Has every agent been tested end to end?** The installer supports multiple targets, but the full workflow needs file, command, and web access. Installation and script checks do not establish end-to-end validation for every client. [Compatibility details (Chinese)](docs/agents.md)
 
-**Can I keep using Chinese?** Yes. Chinese prompts retain the Chinese workflow. Explicit language preferences override automatic selection.
+**Can I change how papers are selected?** Set `daily_papers.ranking.backend` to `agent` (default), `keyword`, or `jev`. Only Jev needs an extra `TYPESAFE_API_KEY`. Upgrades preserve personal configuration; existing Jev users can switch the effective setting to `agent`. [Configuration and migration (Chinese)](docs/usage.md#3-配置并开始使用)
+
+<details>
+<summary>⚡ Optional Jev: recorded scoring cost and latency</summary>
+
+In a single comparison on 2026-10-05, both models received the same 30 candidates and selected 10. GPT-6 Astra scoring took **$0.109264 / 10.35 s**, versus **$0.000576408 / 0.52 s** for Jev 1.13.0, with **9/10 selection overlap**. At the recorded standard API list prices, estimated scoring cost was **99.47% lower** and the call was about **20× faster**.
+
+These are historical **scoring-stage measurements** including the host model's reported cache usage, not a full-workflow cost or an account bill. Selection overlap is not a human quality evaluation. [Recorded evidence and reproduction (Chinese)](docs/jev-benchmark.md)
+
+</details>
 
 ## 🛠️ Development
 
-[Architecture (Chinese)](ARCHITECTURE.md) · [Usage (Chinese)](docs/usage.md) · [Language rules](skills/_shared/language.md)
+[Architecture (Chinese)](ARCHITECTURE.md) · [Agent integration (Chinese)](docs/agents.md) · [Usage (Chinese)](docs/usage.md)
 
 ```bash
 python3 -m pip install -r web-viewer/requirements.txt
 python3 -m unittest discover -s tests -v
 ```
 
-For issues, include your agent/OS version, failing stage, and sanitized logs. Contributions and adaptation feedback are welcome.
+Usage examples, adaptation feedback, issues, and pull requests are welcome. For bugs, include your agent/OS version, failing stage, and sanitized logs.
 
 [![Star History Chart](https://star-history.dera.page/svg?repos=huangkiki/dailypaper-skills&type=Date)](https://star-history.dera.page/#huangkiki/dailypaper-skills&Date)
 
