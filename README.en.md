@@ -10,7 +10,7 @@ These are the Agent skills I use to keep up with research. They find papers on H
 Recommend today's papers.
 ```
 
-One request runs **discovery → selection → review → priority paper notes**. You can also start with a paper you already want to read.
+One request runs **discovery → selection → review → priority paper notes**. You can also send just an arXiv link for a full reading and automatic saving to your configured Obsidian vault or Markdown library.
 
 [🎬 Demo](#-see-it-in-use) · [🧭 Prompts](#-everyday-prompts) · [🚀 Get started](#-get-started) · [📖 Detailed guide (Chinese)](docs/usage.md)
 
@@ -53,12 +53,16 @@ After installation, ask your agent what you want to do:
 | --- | --- |
 | Find today's reading | `Recommend today's papers` |
 | Catch up | `Recommend papers from the past three days` or `Recommend papers from the past week` |
+| Read and save from a link alone | `https://arxiv.org/abs/2509.24527` |
 | Read a specific paper | `Read this paper: <arXiv link or PDF path>` |
+| Read by title or conversation context | `Read Diffusion Policy` or `Help me read this paper` |
 | Get the core contribution | `Quickly summarize this paper: <PDF path>` |
 | Examine the limitations | `Critically analyze this paper: <PDF path>` |
 | Read your collection | `Read Diffusion Policy from my Zotero library` |
 | Follow open-source projects | `Show me weekly GitHub trending` |
 | Refresh navigation after moving notes | `Refresh paper and concept indexes` |
+
+**Reading a paper saves a note by default.** A standalone arXiv `/abs/`, `/pdf/`, or `/html/` link, or a request such as “read this paper” or “help me read it,” starts full-text retrieval, a complete reading, and saving to your configured library. The agent returns the actual note path after saving, without asking whether to save. Quick summaries, critiques, and equation extraction keep the requested depth and also save corresponding notes. Explicit requests such as “answer only in chat,” “do not save,” or a different output destination take priority. If the paper is ambiguous or the output path is missing, the agent asks only for that missing detail. A link cited as part of another task does not trigger a reading.
 
 **You choose the research interests.** Defaults cover LLM reinforcement learning, RL infrastructure, world models/JEPA, dexterous manipulation, and physics simulation. Recommendations use history to avoid repeats and do not pad a sparse list. Must-read papers continue to full notes; existing notes are matched and linked.
 
@@ -103,7 +107,7 @@ Recommend at most 10 papers per day.
 Recommend today's papers.
 ```
 
-The agent selects papers, writes reviews and priority notes, and returns their locations. To try a single paper first, ask `Read this paper: <link or PDF path>`. These are conversation prompts.
+The agent selects papers, writes reviews and priority notes, and returns their locations. To try a single paper first, send an arXiv link or ask `Read this paper: <link or PDF path>`; the reading automatically saves a note. These are conversation prompts.
 
 To upgrade, pull repository updates and rerun `python3 install.py --agent codex --update`, then refresh your session. For multiple agents or custom installation directories, see the [usage guide (Chinese)](docs/usage.md).
 
@@ -114,7 +118,7 @@ Use `daily-papers` to follow new research and `paper-reader` for a specific pape
 | Skill | Role |
 | --- | --- |
 | [daily-papers](skills/daily-papers/SKILL.en.md) | Run the complete daily paper workflow |
-| [paper-reader](skills/paper-reader/SKILL.en.md) | Full reading, quick summaries, and critical analysis of arXiv papers, local PDFs, or Zotero items |
+| [paper-reader](skills/paper-reader/SKILL.en.md) | Read and save from an arXiv link or reading request; full readings, quick summaries, and critiques of arXiv papers, local PDFs, or Zotero items |
 | [daily-papers-fetch](skills/daily-papers-fetch/SKILL.en.md) | Discover, select, and enrich papers from Hugging Face Daily/Trending and arXiv |
 | [daily-papers-review](skills/daily-papers-review/SKILL.en.md) | Write candid reviews, reading priorities, and recommendation pages |
 | [daily-papers-notes](skills/daily-papers-notes/SKILL.en.md) | Generate priority notes, add concepts, and backfill links |
@@ -127,7 +131,7 @@ I also use [Zotero AI Sidebar](https://github.com/huangkiki/zotero-ai-sidebar): 
 
 **Do I need Obsidian?** No. A local Markdown directory is enough. Zotero is only needed when reading your Zotero library.
 
-**Does it run every day or upload my notes automatically?** Runs start when requested. Installation creates no scheduled tasks, and automatic Git commit and push are disabled by default. Scheduling uses your host or system tools; archiving and synchronization follow your chosen destination and authorization.
+**Does it run every day or upload my notes automatically?** Runs start when requested, and installation creates no scheduled tasks. Reading requests save to your local library by default; automatic Git commit and push settings default to off. Git synchronization follows the effective configuration and your existing standing or per-request authorization, without asking again for authorization already given. Scheduling uses your host or system tools.
 
 **Has every agent been tested end to end?** The installer supports multiple targets, but the full workflow needs file, command, and web access. Installation and script checks do not establish end-to-end validation for every client. [Compatibility details (Chinese)](docs/agents.md)
 

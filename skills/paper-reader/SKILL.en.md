@@ -2,6 +2,13 @@
 
 Read the [runtime](../_shared/agent-runtime.en.md) and [language rules](../_shared/language.md), then load effective configuration, including Zotero paths and automation switches. Use English for progress, analysis, new notes, concept explanations, and captions. Keep original titles, identifiers, equations, and existing link targets.
 
+## Default reading and saving contract
+
+- A standalone arXiv paper URL (`/abs/`, `/pdf/`, or `/html/`, including versioned IDs and a `.pdf` suffix) requests full reading and automatic note saving. No extra "read" or "save" instruction is needed. A link used only as a citation, example, or background for another task follows that task.
+- Ordinary "read/analyze this paper", "读一下", and "帮我读" requests run through full-text retrieval, structured reading, note writing in the configured Obsidian/Markdown library, concept maintenance, enabled index refresh, and a final saved-path report. Do not stop at a chat summary, a plan, or a question about saving.
+- Explicit quick-summary, critique, or equation-extraction requests retain that depth and save a corresponding note by default. Explicit chat-only, no-save, or alternative-destination instructions take precedence; do not also archive them in Obsidian.
+- Resolve a title-only request from context, Zotero, or title search. Ask only about an ambiguous paper identity or a missing/nonexistent/uninitialized/unwritable library destination. Do not silently create a guessed vault or claim an unwritten note was saved.
+
 ## Obtain the paper and select a mode
 
 Accept local PDFs, arXiv/DOI links, Zotero searches, or collections. For a collection without a clear batch request, list candidates for selection. For a Zotero item without an attachment, run `python3 assets/zotero_helper.py info ITEM_ID`, then try arXiv HTML, arXiv PDF, DOI, and title search, in that order. Skip only unavailable or non-paper items, reporting why. See [Zotero operations](references/zotero-guide.md) as needed.
@@ -9,11 +16,13 @@ Accept local PDFs, arXiv/DOI links, Zotero searches, or collections. For a colle
 | Request | Output |
 | --- | --- |
 | “Quick summary” / “quickly read” | 3–5 sentences about the core contribution |
-| “Read/analyze this paper” / default | Full structured analysis using the template |
+| Bare arXiv URL / “Read/analyze this paper” / default | Full structured note using the template, saved automatically |
 | “Critique this paper” | Methodological strengths, limitations, and evidence |
 | “Extract equations/technical details” | Equations and algorithm pseudocode |
 
-Respect the requested delivery destination. Full saved notes use [the English paper template](assets/paper-note-template.en.md). Quick summaries do not require a full note. A request for analysis alone does not imply Obsidian archival or Git synchronization.
+Full notes use [the English paper template](assets/paper-note-template.en.md). Explicit quick summaries, critiques, and extraction requests save mode-appropriate notes with the title, source URL, date, reading mode, and actual source coverage; they do not require a full-note expansion. Git synchronization follows configuration and existing user authorization separately from saving.
+
+Normalize the supplied arXiv URL to its ID and requested version, removing query parameters and any `.pdf` suffix. Retrieve HTML first, then PDF, preserving a specified version across fallbacks. Record the source URL/version actually read. Match existing notes by arXiv identity and title before writing; update the original note while preserving user annotations instead of creating duplicates for different URL forms; a quick summary must not replace an existing full note. If full text is unavailable, label any saved partial reading and missing coverage explicitly; an abstract-only note is not a completed full reading.
 
 ## Full-note quality
 
@@ -44,6 +53,10 @@ The helper retains reachable external images and attempts local fallbacks for un
 
 Use the method/model name as the filename, e.g. `Pi05.md`, without a year prefix. Infer it from the title or “we propose” statement; transliterate Greek letters to ASCII. Keep existing collection/category names. In the configured library, save under `NOTES_PATH/{zotero_collection_path}/{MethodName}.md`, or the existing unfiled folder when classification is uncertain. Do not translate folder names automatically.
 
+For a bare arXiv link, PDF, or title without a Zotero collection, inspect the existing topic categories and select the closest match; use the unfiled folder only when uncertain (create that subfolder inside the confirmed library if needed). Missing Zotero metadata is not a reason to skip saving. Record the actual relative category in `zotero_collection`.
+
+Write the note and read it back to confirm the title, source, and new content before reporting success. Explicit chat-only/no-save requests skip note and persistent-asset writes, concept-library writes, index refresh, and Git. For an alternative destination, write only the requested artifacts there and leave the configured Obsidian library unchanged. The concept maintenance below applies only to notes saved in that library.
+
 Keep the template's schema keys (`title`, `method_name`, `authors`, `year`, `venue`, `tags`, `zotero_collection`, `image_source`, `created`) and add `language: en`. Use 3–8 lowercase hyphenated topic tags; preserve verifiable publication status.
 
 Scan every concept link, check all existing categories and aliases, and create missing notes using [the English concept template](assets/concept-note-template.en.md). Reuse [the category rules](references/concept-categories.md) and actual folder names; link this paper as a representative work.
@@ -55,7 +68,9 @@ python3 ../_shared/generate_concept_mocs.py --output-language en
 python3 ../_shared/generate_paper_mocs.py --output-language en
 ```
 
-Git follows the runtime's enabled-and-authorized checks. Review the final source coverage, equations, tables, figure accessibility, inline concept links, and concept-note existence. Report the actual note path and new concept count, plus any unresolved gaps.
+After concept maintenance and checks, Git follows effective configuration and existing authorization; explicit standing or current user instructions take precedence without another confirmation. Detect the repository with `git -C "{VAULT_PATH}" rev-parse --show-toplevel` (including worktrees). Stage only this task's notes, required assets, concepts, and indexes; inspect staged changes and preserve unrelated work. Push only when enabled/authorized and a remote exists, without publishing unrelated local commits or force-pushing.
+
+Review coverage appropriate to the selected mode, figure accessibility, inline links, and concept-note existence. Finish saving and enabled post-processing before reporting the actual note path, new concept count, and unresolved gaps. Report saving, index refresh, commit, and push outcomes separately; a local commit is not a successful push. Do not ask whether to save after the analysis.
 
 ## Batches
 

@@ -1,14 +1,13 @@
 ---
 name: paper-reader
 description: |
-  Use when user asks to "read paper", "analyze paper", "summarize paper",
-  "读论文", "分析文献", "帮我看一下这篇paper", "论文笔记", or provides a PDF file
-  that appears to be an academic paper. Specialized for CV/DL papers.
-
-  Also supports Zotero integration: "读一下这篇论文 ...", "快速看一下这篇论文 ...",
-  "批判性分析这篇论文 ...", "读一下 Zotero 里的 XXX", "批量读一下 Zotero 里 VLA 分类下的论文"
-
-  **重要触发词**: "读一下 XXX"、"读一下这篇"、"帮我读" → 必须调用此 skill
+  Read academic papers from a bare arXiv abs/pdf/html URL, a PDF, a paper title,
+  or Zotero. Use for "read this paper", "analyze this paper", "读一下 XXX",
+  "读一下这篇", "帮我读", "看一下这篇论文", "论文笔记", quick summaries,
+  critiques, and Zotero collection reading. A standalone arXiv link or ordinary
+  reading request defaults to full reading and automatic note saving in the
+  configured Obsidian/Markdown library. Honor explicit depth, destination, and
+  no-save requests; a citation used for another task does not trigger reading.
 ---
 
 ## Language / 语言
@@ -27,6 +26,13 @@ For an English request (or an explicit request for English), read and follow
 # 学术论文阅读助手 (Paper Reader)
 
 专注 CV/DL 领域，支持 Zotero 集成和 Obsidian 笔记保存。
+
+## 默认执行约定
+
+- 单独发送 arXiv 论文链接（`/abs/`、`/pdf/`、`/html/`，含版本号或 `.pdf` 后缀）就是完整阅读请求，无需补说“读一下”或“保存”。链接仅作为其他任务的引用、示例或背景时，按该任务处理。
+- “读一下 XXX”“读一下这篇”“帮我读”“看一下这篇论文”“分析这篇论文”默认执行：获取全文 → 完整解析 → 生成正式笔记 → 写入配置的 Obsidian/Markdown 库 → 补概念与按配置刷新索引 → 报告实际笔记路径。不要停在聊天摘要、计划或“要不要保存”的询问。
+- 用户明确要求快速摘要、批判分析或公式提取时，保留该阅读深度，并默认保存相应模式的笔记；“只在聊天里回答”“不要保存”或指定其他输出位置优先，不额外归档到 Obsidian。
+- 仅有论文名时先用当前上下文、Zotero 或标题检索定位来源；同名论文无法确定时只澄清论文身份。笔记库配置缺失、根目录不存在、仍是未初始化的示例路径或不可写时，只询问/报告实际缺失项，不假装已保存，也不擅自另建一个笔记库。
 
 ## Step 0: 读取共享配置
 
@@ -56,10 +62,12 @@ For an English request (or an explicit request for English), read and follow
 | 输入方式 | 示例 | 处理方法 |
 |----------|------|----------|
 | PDF 路径 | `/path/to/paper.pdf` | 直接 Read |
-| arXiv 链接 | `https://arxiv.org/abs/xxxx` | WebFetch |
+| arXiv 链接（可单独发送） | `https://arxiv.org/abs/xxxx`、`/pdf/xxxx`、`/html/xxxx` | 解析 ID/版本 → 优先获取 HTML 全文，失败回退 PDF → 完整阅读并保存 |
 | Zotero 分类 | "VLA 分类的论文" | 查询数据库 → 列出 → 用户选择 |
 | Zotero 搜索 | "Zotero 里的 π0.5" | 搜索标题 → 找到 PDF |
 | 无 PDF | Zotero 条目无附件 | 从网上获取（见下方） |
+
+从 arXiv 链接保留论文 ID 与用户指定的版本，去掉查询参数或 `.pdf` 后缀后定位同一篇论文；HTML 和 PDF 回退不能偷偷换版本。笔记记录实际阅读的来源链接与版本。先检查已有笔记中的来源 ID/标题，命中同一论文时优先补充原文件并保留用户批注，不因链接形式不同重复建档；快速模式不得用短摘要覆盖已有完整笔记。全文无法获取时明确标记阅读范围和缺失部分，不把仅摘要笔记报告为完整精读。
 
 ### 无 PDF 时的获取流程
 
@@ -76,13 +84,13 @@ For an English request (or an explicit request for English), read and follow
 | 模式 | 触发词 | 输出 |
 |------|--------|------|
 | **快速摘要** | "快速看一下"、"quick" | 3-5 句核心贡献 |
-| **完整解析** | "详细分析"、默认 | 结构化笔记（用模板） |
+| **完整解析** | 裸 arXiv 链接、“读一下”“帮我读”、“详细分析”、默认 | 完整结构化笔记（用模板），自动保存 |
 | **批判分析** | "批判性分析"、"critique" | 方法论优缺点评估 |
 | **知识提取** | "提取公式"、"技术细节" | 公式 + 算法伪代码 |
 
 ## 3. 笔记生成
 
-**模板**: 严格遵循 `assets/paper-note-template.md`，不可自行简化。
+完整解析使用 `assets/paper-note-template.md`，不可自行降级为摘要。下方完整覆盖要求适用于完整解析；明确要求快速摘要、批判分析或知识提取时，按对应模式组织笔记，保留标题、来源链接、日期、阅读模式与实际阅读范围，不强行扩展为完整精读。所有模式默认保存，除非用户明确要求不保存。
 
 ### 核心质量规则
 
@@ -132,6 +140,8 @@ python3 ../daily-papers/download_note_images.py "{笔记完整路径}"
 
 ## 4. Obsidian 保存
 
+将笔记实际写入文件，并读回确认标题、来源和本次内容。未写入成功不能报告“已保存”。默认保存不需要再次征求确认；用户明确选择其他目录或不保存时遵循该选择，明确不保存时跳过笔记与持久附件写入、概念库写入、索引和 Git；输出到其他目录时只写该目标所需产物，不修改配置的 Obsidian 库。第 5 节概念维护仅适用于保存到该库的笔记。
+
 ### 文件命名
 
 只用**方法名/模型名**：`{方法名}.md`（如 `Pi05.md`，不加年份前缀）。
@@ -140,7 +150,9 @@ python3 ../daily-papers/download_note_images.py "{笔记完整路径}"
 
 ### 保存路径
 
-按 Zotero 分类层级：`{NOTES_PATH}/{zotero_collection_path}/{方法名}.md`
+优先按 Zotero 分类层级：`{NOTES_PATH}/{zotero_collection_path}/{方法名}.md`。
+
+裸 arXiv / PDF / 论文名没有 Zotero 分类时，扫描 `{NOTES_PATH}` 的现有分类，按论文主题选择最匹配目录；无法可靠分类时使用 `_待整理/`（已确认的库内缺少该子目录时可创建），不因缺少 Zotero 分类而停止保存。保持已有文件名和内部链接，`zotero_collection` 记录实际相对目录。
 
 ### YAML frontmatter
 
@@ -160,23 +172,20 @@ created: YYYY-MM-DD
 
 Tags 判断：看 Related Work 小标题 + Abstract 关键词。第一个 tag 是最核心主题。
 
-### 保存后自动执行
+### 概念补齐后自动执行
 
-1. 只有在 `AUTO_REFRESH_INDEXES=true` 时才刷新目录页：
+先完成第 5 节概念维护和笔记/图片检查，再处理索引与 Git：
+
+1. 只有在 `AUTO_REFRESH_INDEXES=true` 时刷新目录页：
    ```bash
    python3 ../_shared/generate_concept_mocs.py
    python3 ../_shared/generate_paper_mocs.py
    ```
-2. 只有在 `GIT_COMMIT_ENABLED=true` 时才做 git：
-   - 先确认 `VAULT_PATH/.git` 存在
-   - `git add {新增文件} {paper_notes_folder}/` 后必须真的有 staged changes
-   - 满足条件后再执行：
-   ```bash
-   cd {VAULT_PATH} && git add {新增文件} {paper_notes_folder}/ && git commit -m "add paper note: {方法名}"
-   ```
-   - 只有在 `GIT_PUSH_ENABLED=true` 且仓库已配置远端时才 push
+2. Git 按有效配置和用户已有授权执行；明确的长期或当次授权优先，不重复询问。没有已有授权时不把自动保存等同于自动发布。使用 `git -C "{VAULT_PATH}" rev-parse --show-toplevel` 确认仓库（兼容 worktree）。
+3. 仅暂存本次新增/修改的笔记、必要附件、概念和索引，先检查暂存差异；不得使用整个论文目录的 `git add` 混入其他任务变更。存在本次变更时再 commit；push 还需要启用/已授权、已配置远端，且不会带入无关本地提交。遇到分叉或其他改动时按已有工作流隔离整合，不强推。
+4. 分别报告保存、索引、commit、push 的实际结果；同步失败不能把本地 commit 报告为 push 成功。
 
-## 5. 概念库维护（每篇论文必做）
+## 5. 概念库维护（保存到笔记库时执行）
 
 概念库位置：`{CONCEPTS_PATH}`
 
@@ -195,17 +204,17 @@ Tags 判断：看 Related Work 小标题 + Abstract 关键词。第一个 tag �
 
 ## 6. 完成后自检（合并 checklist）
 
-- [ ] 所有 Figure 都在笔记中（数量与论文一致）？
-- [ ] 所有公式都在笔记中（变量一致、无冲突）？
-- [ ] 所有 Table 完整保留（所有行列）？
+- [ ] 已按请求模式写入并读回实际笔记文件（明确不保存除外），来源链接和阅读范围准确？
+- [ ] 完整解析时：所有 Figure 都在笔记中（数量与论文一致）？
+- [ ] 完整解析时：所有公式都在笔记中（变量一致、无冲突）？
+- [ ] 完整解析时：所有 Table 完整保留（所有行列）？
 - [ ] 正文中技术术语有 `[[概念]]` 内联链接？
 - [ ] 概念库已更新（缺失的概念已创建）？
 - [ ] 图片可用（外链可加载 / 本地 >10KB）？
 
-## 7. 交互式功能
+## 7. 完成后反馈
 
-完成解析后询问：深入解释？对比其他论文？保存到 Obsidian？
-保存后自动创建缺失概念笔记，报告新增概念数量。
+先完成阅读、保存和配置启用的后处理，再简短报告笔记实际路径、新增概念数量及未解决的阅读/保存/同步问题。可在完成后继续深入解释或对比论文；不要再询问是否保存，也不要用后续建议代替本次交付。
 
 ## 8. 批量处理
 

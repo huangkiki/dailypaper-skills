@@ -22,6 +22,8 @@ The bundle needs file access, Python/command execution, web access, and Markdown
 
 Follow the user's chosen destination and the host's permissions. A configured vault is an available destination, not permission to archive there when the user requests chat or project-local output. Never infer Obsidian synchronization from language selection.
 
+For `paper-reader`, a standalone arXiv link or ordinary reading request defaults to reading and saving in the configured library without another save confirmation. Explicit chat-only, no-save, or alternative-destination instructions take precedence; follow the skill's default reading and saving contract.
+
 Read `automation.auto_refresh_indexes`, `git_commit`, and `git_push`. Index refresh defaults to enabled; Git actions default to disabled. Git additionally requires existing user authorization, a repository, and actual staged changes. Stage only task files, preserve unrelated changes, and push only when both Git switches permit it and a remote exists.
 
 The optional `paper_daemon.py` and Web Viewer's Claude chat button still require Claude CLI. The browser UI and daemon are separate entry points; this language routing applies to skill requests, not to the Web Viewer's interface.
