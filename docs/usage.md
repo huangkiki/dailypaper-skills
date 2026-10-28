@@ -102,7 +102,7 @@ $env:TYPESAFE_API_KEY = "你的 TypeSafe API key"
 
 直接调用生成脚本时，`generate_paper_mocs.py`、`generate_concept_mocs.py` 和 `write_trending_note.py` 支持 `--output-language en`，默认 `zh`。`fetch_trending.py --language python` 仍然是编程语言筛选。Web Viewer 界面和可选 Claude daemon 不在此语言切换范围内。
 
-[English README](../README.md) · [完整语言规则](../skills/_shared/language.md)
+[English README](../README.en.md) · [完整语言规则](../skills/_shared/language.md)
 
 ## 日常怎么用
 
