@@ -1,6 +1,6 @@
 # dailypaper-skills 🗞️
 
-[English](README.md) | **简体中文**
+**简体中文** | [English](README.en.md)
 
 **每天一句话，筛论文、看锐评，把值得读的研究变成自己的笔记。**
 
