@@ -14,6 +14,35 @@ language: en
 
 # Paper notes: {Title}
 
+## Critical verdict
+
+> **Verdict**: {Clear assessment, what is worth learning, and whether reproduction is worthwhile, with reasons. An optional verdict label may accompany it.}
+
+### Actual novelty
+
+{What changed relative to specific prior work and what was reused. Cite sources and bound the assessment.}
+
+### Strongest evidence
+
+{The most convincing result, comparison conditions, and claim it supports. Anchor it to sections, figures, tables, equations, or inspected code.}
+
+### Key gap and scope
+
+{The evidence gap that most affects the conclusion, or the validated scope. Separate author claims, evidence, and your inference. Unverified is not absent; do not manufacture flaws.}
+
+### Potential improvements
+
+{Suggestions distinguished from claims made by the paper.}
+
+### Reproducibility
+
+- [ ] Code available
+- [ ] Pretrained models available
+- [ ] Training details sufficient
+- [ ] Datasets accessible
+
+{Check only verified items and cite the relevant source.}
+
 ## Metadata
 
 | Field | Details |
@@ -120,35 +149,6 @@ $$
 ### Results and qualitative observations
 
 {Reported results, metric definitions, baselines, uncertainty, and real/simulated evaluation settings. Separate the authors' results from any independently verified reproduction.}
-
-## Critical verdict
-
-> **Verdict**: {Clear assessment, what is worth learning, and whether reproduction is worthwhile, with reasons. An optional verdict label may accompany it.}
-
-### Actual novelty
-
-{What changed relative to specific prior work and what was reused. Cite sources and bound the assessment.}
-
-### Strongest evidence
-
-{The most convincing result, comparison conditions, and claim it supports. Anchor it to sections, figures, tables, equations, or inspected code.}
-
-### Key gap and scope
-
-{The evidence gap that most affects the conclusion, or the validated scope. Separate author claims, evidence, and your inference. Unverified is not absent; do not manufacture flaws.}
-
-### Potential improvements
-
-{Suggestions distinguished from claims made by the paper.}
-
-### Reproducibility
-
-- [ ] Code available
-- [ ] Pretrained models available
-- [ ] Training details sufficient
-- [ ] Datasets accessible
-
-{Check only verified items and cite the relevant source.}
 
 ## Related notes
 
