@@ -88,7 +88,7 @@ For an English request (or an explicit request for English), read and follow
 2. **质量检查已有笔记**（不是只看文件是否存在）：
    - 对已有 `📒 **笔记**` / `📒 **已有笔记**` / `📒 **Note**` / `📒 **Existing note**` 标记的论文，用 Glob 找到对应笔记文件，检查行数
    - **行数 < 100 的视为骨架笔记，必须重新生成**（保留有效内容，重新调用 paper-reader 补全）
-   - 行数 >= 100 且包含 `## 关键公式` / `## Key equations` 和 `## 关键图表` / `## Figures and tables` 的才算合格，可以跳过
+   - 行数 >= 100 且包含 `## 关键公式` / `## Key equations` 和 `## 关键图表` / `## Figures and tables` 后，还需检查是否已有基于证据的独立锐评（新意、最强证据、关键缺口或边界、明确判决）；标题不同但内容等价也可通过。缺少锐评时补充原笔记并保留有效内容与用户批注，不能仅因篇幅够长就跳过
 3. 对每篇需要生成/重新生成的论文，执行 [paper-reader](../paper-reader/SKILL.md)（传入 arXiv 链接）
    - **不要指定固定的输出路径**，让 paper-reader 自行决定文件名和分类目录
    - paper-reader 会用方法名缩写作为文件名（如 `DAPL.md`），并自动分类到正确子目录
@@ -105,7 +105,7 @@ For an English request (or an explicit request for English), read and follow
 不要因为"怕 context overflow"或"论文太多"就自己写个 70 行的骨架糊弄过去。
 宿主支持且允许子 Agent 时，可用独立上下文运行 paper-reader；否则读取其 `SKILL.md` 和引用模板，在当前会话逐篇执行，并及时保存进度。
 
-笔记质量由 paper-reader skill 自身保证（模板、公式、图片、概念链接等规则均在 paper-reader 中定义）。
+笔记质量由 paper-reader skill 自身保证（模板、公式、图片、概念链接及独立锐评等规则均在 paper-reader 中定义）。推荐页的短评不能代替全文阅读后的研究判断。
 
 #### 🔍 生成后质量验证（每篇必须执行）
 
@@ -114,7 +114,8 @@ For an English request (or an explicit request for English), read and follow
 2. 包含 `$$` 或 `$` LaTeX 公式（至少 2 处）
 3. 包含 `![` 图片引用（至少 1 张）
 4. 包含 `## 关键公式` / `## Key equations` 和 `## 实验结果` / `## 实验` / `## Experiments` section header
-5. 若检查未通过，对照原论文修复并复核；保留已有有效内容。行数只是骨架筛查，不能为凑行数、公式或图片数量编造内容；原论文本身没有某类内容时明确注明。
+5. 独立锐评包含新意、最强证据、关键缺口或边界与明确判决，关键判断能定位到来源；仅有标题或泛泛优缺点不算通过
+6. 若检查未通过，对照原论文修复并复核；保留已有有效内容。行数只是骨架筛查，不能为凑行数、公式或图片数量编造内容；原论文本身没有某类内容时明确注明。
 
 ### Step 3: 笔记链接回填
 

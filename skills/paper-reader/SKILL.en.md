@@ -5,7 +5,7 @@ Read the [runtime](../_shared/agent-runtime.en.md) and [language rules](../_shar
 ## Default reading and saving contract
 
 - A standalone arXiv paper URL (`/abs/`, `/pdf/`, or `/html/`, including versioned IDs and a `.pdf` suffix) requests full reading and automatic note saving. No extra "read" or "save" instruction is needed. A link used only as a citation, example, or background for another task follows that task.
-- Ordinary "read/analyze this paper", "读一下", and "帮我读" requests run through full-text retrieval, structured reading, note writing in the configured Obsidian/Markdown library, concept maintenance, enabled index refresh, and a final saved-path report. Do not stop at a chat summary, a plan, or a question about saving.
+- Ordinary "read/analyze this paper", "读一下", and "帮我读" requests run through full-text retrieval, structured reading with an independent critical verdict, note writing in the configured Obsidian/Markdown library, concept maintenance, enabled index refresh, and a final verdict with the saved path. Do not stop at a chat summary, a plan, or a question about saving.
 - Explicit quick-summary, critique, or equation-extraction requests retain that depth and save a corresponding note by default. Explicit chat-only, no-save, or alternative-destination instructions take precedence; do not also archive them in Obsidian.
 - Resolve a title-only request from context, Zotero, or title search. Ask only about an ambiguous paper identity or a missing/nonexistent/uninitialized/unwritable library destination. Do not silently create a guessed vault or claim an unwritten note was saved.
 
@@ -16,8 +16,8 @@ Accept local PDFs, arXiv/DOI links, Zotero searches, or collections. For a colle
 | Request | Output |
 | --- | --- |
 | “Quick summary” / “quickly read” | 3–5 sentences about the core contribution |
-| Bare arXiv URL / “Read/analyze this paper” / default | Full structured note using the template, saved automatically |
-| “Critique this paper” | Methodological strengths, limitations, and evidence |
+| Bare arXiv URL / “Read/analyze this paper” / default | Full structured note with an independent critical verdict, saved automatically |
+| “Critique this paper” | Method and evidence assessment centered on an independent critical verdict |
 | “Extract equations/technical details” | Equations and algorithm pseudocode |
 
 Full notes use [the English paper template](assets/paper-note-template.en.md). Explicit quick summaries, critiques, and extraction requests save mode-appropriate notes with the title, source URL, date, reading mode, and actual source coverage; they do not require a full-note expansion. Git synchronization follows configuration and existing user authorization separately from saving.
@@ -31,6 +31,19 @@ Normalize the supplied arXiv URL to its ID and requested version, removing query
 - For each equation, provide a linked name, LaTeX block, meaning, and all symbol definitions. Keep blank lines around `$$`; split long expressions with `aligned`. Verify bound/free variables, notation consistency, limits, stop-gradient and other operators against the paper.
 - Use `### Figure N: Original English caption` and an English explanation. Do not add a Chinese caption simply because the Chinese reference uses bilingual titles.
 - Read [quality standards](references/quality-standards.md) for detailed checks; its Chinese labels map to the English template. Source-faithfulness and coverage are unchanged.
+
+## Independent critical verdict
+
+Full readings and critiques include a separate **Critical verdict** in the note and a concise verdict in the final chat response. This does not depend on running `daily-papers-review` first. An abstract recap, a list of pros and cons, or a saved-path report alone is insufficient.
+
+- **Actual novelty**: Compare with specific prior work and identify the new mechanism, combination, data, scale, or engineering tradeoff. Bound novelty claims when the prior work could not be verified.
+- **Strongest evidence**: Identify the most convincing result, its comparison conditions, and the precise claim it supports instead of merely praising performance.
+- **Key gap or boundary**: Examine the confound, ablation, baseline fairness, cost, or generalization limit that most affects the conclusion. Insufficient evidence is different from evidence of failure. If no reliable flaw is established, state the validated scope rather than manufacturing a criticism.
+- **Clear verdict**: Decide whether the paper merits close reading, offers a useful idea needing more evidence, adds limited value, or is not currently recommended. Explain what is worth learning and whether reproduction is worthwhile. Labels such as 🔥 / 👀 / ⚠️ / 🫠 are optional and never replace reasons.
+
+Be direct and opinionated about methods and evidence. Anchor material judgments to sections, figures, tables, equations, or inspected code locations; distinguish author claims, reported evidence, and your inference. Before alleging a missing ablation, real-world experiment, or baseline, check the relevant sections and available supplements; unread material is unverified, not absent. Distinguish static code inspection from actual execution and reproduction.
+
+Quick summaries, equation extraction, and explicit requests to summarize without evaluation do not require the full verdict. A no-save request changes persistence, not depth: a full chat-only reading still includes the verdict. If full text is unavailable, limit any provisional judgment to the material read and list what remains unverified; do not treat inaccessible experiments as missing.
 
 ## Obtain and verify figures
 
@@ -70,7 +83,11 @@ python3 ../_shared/generate_paper_mocs.py --output-language en
 
 After concept maintenance and checks, Git follows effective configuration and existing authorization; explicit standing or current user instructions take precedence without another confirmation. Detect the repository with `git -C "{VAULT_PATH}" rev-parse --show-toplevel` (including worktrees). Stage only this task's notes, required assets, concepts, and indexes; inspect staged changes and preserve unrelated work. Push only when enabled/authorized and a remote exists, without publishing unrelated local commits or force-pushing.
 
-Review coverage appropriate to the selected mode, figure accessibility, inline links, and concept-note existence. Finish saving and enabled post-processing before reporting the actual note path, new concept count, and unresolved gaps. Report saving, index refresh, commit, and push outcomes separately; a local commit is not a successful push. Do not ask whether to save after the analysis.
+## Final checks and response
+
+Review coverage appropriate to the selected mode, figure accessibility, inline links, and concept-note existence. For full readings and critiques, unless the user explicitly declined evaluation, verify that both the note and final response contain actual novelty, strongest evidence, a key gap or boundary, and a clear verdict; for no-save requests, check the chat response. Check source anchors and keep inferences and unverified items distinct from established flaws.
+
+Finish saving and enabled post-processing before responding. For full readings and critiques, lead with the core conclusion and a separate concise critical verdict: the decision, key evidence, and boundary that most affects it. Then report the actual note path, new concept count, and unresolved reading/saving/synchronization gaps. A verdict in the saved file does not replace the chat verdict; do not defer it as an optional follow-up. Other modes and explicit no-evaluation requests retain their requested scope. Report saving, index refresh, commit, and push outcomes separately; a local commit is not a successful push. Do not ask whether to save after the analysis.
 
 ## Batches
 

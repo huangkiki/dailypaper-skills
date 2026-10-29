@@ -121,15 +121,21 @@ $$
 
 {Reported results, metric definitions, baselines, uncertainty, and real/simulated evaluation settings. Separate the authors' results from any independently verified reproduction.}
 
-## Critical assessment
+## Critical verdict
 
-### Strengths
+> **Verdict**: {Clear assessment, what is worth learning, and whether reproduction is worthwhile, with reasons. An optional verdict label may accompany it.}
 
-{Concrete strengths with evidence.}
+### Actual novelty
 
-### Limitations
+{What changed relative to specific prior work and what was reused. Cite sources and bound the assessment.}
 
-{Demonstrated limitations and clearly marked open questions.}
+### Strongest evidence
+
+{The most convincing result, comparison conditions, and claim it supports. Anchor it to sections, figures, tables, equations, or inspected code.}
+
+### Key gap and scope
+
+{The evidence gap that most affects the conclusion, or the validated scope. Separate author claims, evidence, and your inference. Unverified is not absent; do not manufacture flaws.}
 
 ### Potential improvements
 
@@ -168,6 +174,7 @@ $$
 > - **Core idea**: {One sentence.}
 > - **Method**: {Mechanism.}
 > - **Result**: {Evidence with scope.}
+> - **Verdict**: {One-sentence research-value judgment and its scope.}
 > - **Code**: {Verified link or unavailable.}
 
 *Notes created: {timestamp}*
