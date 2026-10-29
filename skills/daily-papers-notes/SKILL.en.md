@@ -16,7 +16,9 @@ Read the recommendation's priority table, accepting `Must read` and `必读`. Ge
 
 Check existing notes rather than merely checking existence. Accept corresponding headings in either language: Key equations/关键公式, Figures and tables/关键图表, and Experiments/实验/实验结果. The existing workflow uses 100 lines as a skeleton warning, and checks newly generated full notes for at least 120 lines, two math expressions, and one image reference. These are screening checks, not permission to pad a note, fabricate formulas, or add nonexistent figures. Compare against the source's actual equations, figures, tables, and results; explain a source with no applicable item. Preserve existing useful content while repairing incomplete notes.
 
-Invoke [paper-reader](../paper-reader/SKILL.md) for each paper with its arXiv/PDF source and `OUTPUT_LANGUAGE=en`. Let it choose the method-based filename and collection path; record the actual path after generation. Use the full template and verify source coverage immediately. Do not replace the workflow with a short summary or omit papers because there are many. Paper-reader maintains concepts too; avoid duplicate creation.
+Before skipping an existing note and after generating a new one, check for an evidence-based independent critical verdict: actual novelty, strongest evidence, a key gap or boundary, and a clear decision with source anchors. Equivalent content under another heading is acceptable; a heading alone or generic pros and cons are not. Repair a missing verdict in the original note while preserving valid content and user annotations. The recommendation page's short review does not replace a judgment based on full reading.
+
+Invoke [paper-reader](../paper-reader/SKILL.md) for each paper with its arXiv/PDF source and `OUTPUT_LANGUAGE=en`. Let it choose the method-based filename and collection path; record the actual path after generation. Use the full template, including the independent critical verdict, and verify source coverage immediately. Do not replace the workflow with a short summary or omit papers because there are many. Paper-reader maintains concepts too; avoid duplicate creation.
 
 ## Backfill and finish
 
