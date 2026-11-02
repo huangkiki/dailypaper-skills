@@ -34,7 +34,9 @@ Normalize the supplied arXiv URL to its ID and requested version, removing query
 
 ## Independent critical verdict
 
-Full readings and critiques include a separate **Critical verdict** in the note and a concise verdict in the final chat response. This does not depend on running `daily-papers-review` first. An abstract recap, a list of pros and cons, or a saved-path report alone is insufficient.
+Full readings and critiques put **Critical verdict** immediately after the note title as the first body section, with the decision before its supporting evidence. Metadata, summary, method, and experiments follow it; YAML frontmatter stays at the very top of the file. The final chat response also opens with a concise verdict. This does not depend on running `daily-papers-review` first. An abstract recap, a list of pros and cons, or a saved-path report alone is insufficient.
+
+This is presentation order: read and verify the evidence before forming the judgment. When updating an existing note, move its complete verdict after the title, preserving sources and user annotations; do not merely copy a one-line decision to the top while leaving the substantive critique at the end. Honor an explicit user request for a different order.
 
 - **Actual novelty**: Compare with specific prior work and identify the new mechanism, combination, data, scale, or engineering tradeoff. Bound novelty claims when the prior work could not be verified.
 - **Strongest evidence**: Identify the most convincing result, its comparison conditions, and the precise claim it supports instead of merely praising performance.
@@ -85,9 +87,9 @@ After concept maintenance and checks, Git follows effective configuration and ex
 
 ## Final checks and response
 
-Review coverage appropriate to the selected mode, figure accessibility, inline links, and concept-note existence. For full readings and critiques, unless the user explicitly declined evaluation, verify that both the note and final response contain actual novelty, strongest evidence, a key gap or boundary, and a clear verdict; for no-save requests, check the chat response. Check source anchors and keep inferences and unverified items distinct from established flaws.
+Review coverage appropriate to the selected mode, figure accessibility, inline links, and concept-note existence. For full readings and critiques, unless the user explicitly declined evaluation, verify that the first body section after the note title and the opening of the final response are the critical verdict, covering actual novelty, strongest evidence, a key gap or boundary, and a clear decision. For no-save requests, check the chat response; honor a user-specified order. Check source anchors and keep inferences and unverified items distinct from established flaws.
 
-Finish saving and enabled post-processing before responding. For full readings and critiques, lead with the core conclusion and a separate concise critical verdict: the decision, key evidence, and boundary that most affects it. Then report the actual note path, new concept count, and unresolved reading/saving/synchronization gaps. A verdict in the saved file does not replace the chat verdict; do not defer it as an optional follow-up. Other modes and explicit no-evaluation requests retain their requested scope. Report saving, index refresh, commit, and push outcomes separately; a local commit is not a successful push. Do not ask whether to save after the analysis.
+Finish saving and enabled post-processing before responding. For full readings and critiques, open with a separate concise critical verdict: the decision, key evidence, and boundary that most affects it. Explain the core method next if useful, and report the actual note path, new concept count, and unresolved reading/saving/synchronization gaps last. Do not substitute an opening “read/saved” status for the verdict. A verdict in the saved file does not replace the chat verdict; do not defer it as an optional follow-up. Other modes, explicit no-evaluation requests, and user-specified ordering retain their requested scope. Report saving, index refresh, commit, and push outcomes separately; a local commit is not a successful push. Do not ask whether to save after the analysis.
 
 ## Batches
 
